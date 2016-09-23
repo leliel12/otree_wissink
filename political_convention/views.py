@@ -8,7 +8,7 @@ from .models import Constants
 
 def vars_for_all_templates(page):
     return {
-        "params": Constants.params,
+        "p": Constants.p,
         "DEBUG": settings.DEBUG,
         "because_debug": "<small>DEBUG is True</small>"}
 
@@ -27,19 +27,42 @@ class InformedConsent(Page):
 class Instructions1(Page):
     pass
 
+
 class Instructions2(Page):
     pass
 
+
 class Instructions3(Page):
     pass
+
 
 class Instructions4(Page):
     pass
 
 
+class PhasesDescription(Page):
+    pass
+
+
+class ComprehensionCheck(Page):
+
+    form_model = models.Player
+    form_fields = [
+        "cq{}".format(idx)
+        for idx in range(len(Constants.comprehension_questions))]
+
+    def error_message(self, values):
+        msg = []
+        for k, v in values.items():
+            idx = int(k.replace("cq", ""))
+            q = Constants.comprehension_questions[idx]
+            if not q.is_correct(v):
+                msg.append("{} are incorrect".format(q.question))
+        return msg
 
 
 page_sequence = [
-    InformedConsent,
-    Instructions1, Instructions2, Instructions3, Instructions4,
+    #~ InformedConsent,
+    #~ Instructions1, Instructions2, Instructions3, Instructions4,
+    #~ PhasesDescription, ComprehensionCheck,
 ]

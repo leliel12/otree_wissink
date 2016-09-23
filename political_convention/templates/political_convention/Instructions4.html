@@ -9,19 +9,62 @@
 <div class="row">
     <div class="col-md-12 lead">
         <p>
-            In this study, we conduct research on how people negotiate and form coalitions.
+            In the current situation, it is important to realize that not all people have an equal bargaining position.
+            Specifically, A controls <span class="text-info">{{p.votes_player_A}} votes</span>, 
+            B controls <span class="text-info">{{p.votes_player_B}} votes</span> and C controls 
+            <span class="text-info">{{p.votes_player_C}} votes</span>. As this totals
+            <span class="text-warning">{{p.ABC_coalition_votes}} votes</span> votes,
+            any coalition that controls at least
+            <span class="text-success">{{p.votes_necessary_for_coalition}} votes</span> controls a
+            majority of the votes.
+
+            A coalition needs this majority of the votes in order to allocate the 
+            <span class="text-info">{{p.total_sum_of_outcomes}} points</span> 
+            among the members of the coalition.
+
+            Thus possible coalitions are coalitions between:
+            <ul>
+                {% if p.AB_coalition_posibility %}
+                <li>A and B (AB coalition with <span class="text-info">{{p.AB_coalition_votes}} votes</span>)</li>
+                {% endif %}
+
+                {% if p.BC_coalition_posibility %}
+                <li>B and C (BC coalition with <span class="text-info">{{p.BC_coalition_votes}} votes</span>)</li>
+                {% endif %}
+
+                {% if p.AC_coalition_posibility %}
+                <li>A and C (AC coalition with <span class="text-info">{{p.AC_coalition_votes}} votes</span>)</li>
+                {% endif %}
+
+                {% if p.ABC_coalition_posibility %}
+                <li>A, B, and C (ABC coalition with <span class="text-info">{{p.ABC_coalition_votes}} votes</span>)</li>
+                {% endif %}
+            </ul>
         </p>
         <p>
-            TYou are one of three people negotiating how to allocate a sum of 
-            <span class="text-info">{{params.total_sum_of_outcomes}} points</span>,
-            an outcome that is equally important to all of you. It is important to realize
-            that you are not able to obtain the outcome by yourself and consequently you need to
-            join forces with another individual. This means that you need to form a coalition in which
-            you need to reach an agreement about the allocation of the outcome.
+            <strong>Importantly</strong>, payoffs can only be allocated to members of a coalition.
+            This means:
+            <ul>
+                {% if p.AB_coalition_posibility %}
+                 <li>AB coalition can allocate the outcomes to A and B (but not to C)</li>
+                {% endif %}
+
+                {% if p.BC_coalition_posibility %}
+                <li>BC coalition can allocate outcomes to B and C (but not to A)</li>
+                {% endif %}
+
+                {% if p.AC_coalition_posibility %}
+                <li>AC coalition can allocate outcomes to A and C (but not to B)</li>
+                {% endif %}
+            </ul>
         </p>
         <p>
-            On the following page we will explain more about the bargaining position of each person and the possible coalitions.
+            If you are included in one of the abovementioned coalitions you will be able to
+            get a share of the outcomes. However, if you are not included in one of the coalitions you
+            will not be able to get a share of the outcomes. Moreover, after the bargaining is
+            over, votes have no value.
         </p>
+        <p>On the following page we will explain how the forming of coalitions takes place.</p>
         <p>
             Please press <kbd>Next</kbd> to go to the next screen.
         </p>

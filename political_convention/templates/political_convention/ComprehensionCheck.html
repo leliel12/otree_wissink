@@ -1,0 +1,30 @@
+{% extends "global/Base.html" %}
+{% load staticfiles otree_tags %}
+
+{% block title %}
+    Comprehension Check
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12 lead">
+        <p>Before playing the first game, we want to ask you a few questions to
+           check whether you have understood the instructions.</p>
+    </div>
+            <ul>
+            {% for field in form %}
+            <li>
+                {% formfield field %}
+            </li>
+            {% endfor %}
+        </ul>
+
+</div>
+
+<div class="row">
+    <div class="col-md-1 col-md-offset-11">
+    {% next_button %}
+    </div>
+</div>
+
+{% endblock %}

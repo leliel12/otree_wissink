@@ -1,0 +1,71 @@
+{% extends "global/Base.html" %}
+{% load staticfiles otree_tags %}
+
+{% block title %}
+    Game Phases
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12 lead">
+        <p>
+            As mentioned earlier, you will play multiple games as either
+            Player A, Player B, and Player C. One game contains multiple phases,
+            which will are explained below.
+        </p>
+        <h3><strong>Phase I: Making offers.</strong></h3>
+        <p>
+            In an attempt to form a coalition in which one is included, every
+            player will make an offer to one or more other players to form a
+            coalition. This offer is made by sending them an offer how to
+            allocate the <span class="text-info">{{p.total_sum_of_outcomes}} points</span>
+            between themselves and the ones they are making an offer to.
+        </p>
+
+        {% if p.coalition_before_formation_step_II %}
+        <h3><strong>Phase II: Choosing offers.</strong></h3>
+        <p>
+            When everyone has made their offers, all offers are displayed to all
+            players. Players then choose which of the shown coalitions they want
+            to form. That is, they either select their own offer or an offer
+            made by another player that includes them in a coalition.
+        </p>
+        <h3><strong>Phase III: Seeing acceptance of offers.</strong></h3>
+        {% else %}
+        <h3><strong>Phase II: Seeing acceptance of offers.</strong></h3>
+        {% endif %}
+
+        <p>
+            When everyone has chosen an offer all chosen offers are displayed.
+            If all those who are involved in a certain coalition offer select
+            that offer, the coalition is formed and the <span class="text-info">{{p.total_sum_of_outcomes}} points</span> is
+            distributed as shown in the offer. If no coalition is selected by all
+            its potential members, no coalition is formed and players will enter
+            another bargaining round and return to <span class="text-info">Phase I: Making offers</span>.
+            In principle, there can be many bargaining rounds until a coalition
+            is formed and the game ends.
+        </p>
+        <p>
+            When a game has ended, everyone participating in the experiment
+            (all different players A, B, and C) are randomly matched to play a new
+            game This means that you will attain your own position (if you are Player A,
+            you will still be player A), but you will be matched with another Player B
+            and another Player C than in the previous game.
+        </p>
+        <p>
+            Remember that the session has <span class="text-info">{{p.number_of_games}} games</span> and you will not receive any
+            bonus payment unless you play all <span class="text-info">{{p.number_of_games}} games</span>.
+        </p>
+        <p>
+            Please press <kbd>Next</kbd> to go to the next screen.
+        </p>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-1 col-md-offset-11">
+    {% next_button %}
+    </div>
+</div>
+
+{% endblock %}

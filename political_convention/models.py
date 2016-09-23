@@ -8,7 +8,7 @@ from otree.api import (
     Currency as c, currency_range, safe_json
 )
 
-from . import parameters_parser
+from . import utils
 
 
 author = 'Your name here'
@@ -18,13 +18,25 @@ Your app description
 """
 
 
+
+
 class Constants(BaseConstants):
     name_in_url = 'political_convention'
     players_per_group = None
     num_rounds = 1
 
-    params_path = settings.POLITICAL_CONVENTION_PARAMS_PATH
-    params = parameters_parser.parse(params_path)
+    p_path = settings.POLITICAL_CONVENTION_PARAMS_PATH
+    p = utils.parse_argsfile(p_path)
+
+    comprehension_questions = [
+        utils.ComprehensionQuestion(
+            question="choose foo!", choices=("foo", "spam", "eggs"), answer=0),
+        utils.ComprehensionQuestion(
+            question="choose spam!", choices=("foo", "spam", "eggs"), answer=1),
+        utils.ComprehensionQuestion(
+            question="choose eggs!", choices=("foo", "spam", "eggs"), answer=2)
+    ]
+
 
 
 class Subsession(BaseSubsession):
@@ -37,3 +49,14 @@ class Group(BaseGroup):
 
 class Player(BasePlayer):
     pass
+
+
+
+for idx, cq in enumerate(Constants.comprehension_questions):
+    Player.add_to_class(
+        "cq{}".format(idx), models.CharField(max_length=cq.max_length,
+                                             verbose_name=cq.question,
+                                             choices=cq.choices,
+                                             widget=widgets.RadioSelectHorizontal())
+    )
+

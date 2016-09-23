@@ -31,6 +31,12 @@ def outcome(instance, attribute, value):
             raise ValueError(msg)
 
 
+def answer(instance, attribute, value):
+    if value >= len(instance.choices):
+        msg = "answer out of range"
+        raise ValueError(msg)
+
+
 # =============================================================================
 # CONVERSION
 # =============================================================================
@@ -80,9 +86,9 @@ class Params(object):
     possibility_A_to_propose_an_AC_coalition = attr.ib(convert=to_bool)
     possibility_A_to_propose_an_ABC_coalition = attr.ib(convert=to_bool)
     possibility_B_to_propose_an_AB_coalition = attr.ib(convert=to_bool)
-    possibility_B_to_propose_an_AC_coalition = attr.ib(convert=to_bool)
+    possibility_B_to_propose_an_BC_coalition = attr.ib(convert=to_bool)
     possibility_B_to_propose_an_ABC_coalition = attr.ib(convert=to_bool)
-    possibility_C_to_propose_an_AB_coalition = attr.ib(convert=to_bool)
+    possibility_C_to_propose_an_BC_coalition = attr.ib(convert=to_bool)
     possibility_C_to_propose_an_AC_coalition = attr.ib(convert=to_bool)
     possibility_C_to_propose_an_ABC_coalition = attr.ib(convert=to_bool)
 
@@ -99,16 +105,70 @@ class Params(object):
     possibility_to_give_C_money_in_an_BC_coalition = attr.ib(convert=to_bool)
     possibility_to_give_C_money_in_an_ABC_coalition = attr.ib(convert=to_bool)
 
-
     def __repr__(self):
         return "<Params '{}'>".format(self.path)
+
+    @property
+    def AB_coalition_votes(self):
+        return self.votes_player_A + self.votes_player_B
+
+    @property
+    def BC_coalition_votes(self):
+        return self.votes_player_B + self.votes_player_C
+
+    @property
+    def AC_coalition_votes(self):
+        return self.votes_player_A + self.votes_player_C
+
+    @property
+    def ABC_coalition_votes(self):
+        return self.votes_player_A + self.votes_player_B + self.votes_player_C
+
+    @property
+    def AB_coalition_posibility(self):
+        return (
+            self.possibility_A_to_propose_an_AB_coalition or
+            self.possibility_B_to_propose_an_AB_coalition)
+
+    @property
+    def AC_coalition_posibility(self):
+        return (
+            self.possibility_A_to_propose_an_AC_coalition or
+            self.possibility_C_to_propose_an_AC_coalition)
+
+    @property
+    def BC_coalition_posibility(self):
+        return (
+            self.possibility_B_to_propose_an_BC_coalition or
+            self.possibility_C_to_propose_an_BC_coalition)
+
+    @property
+    def ABC_coalition_posibility(self):
+        return (
+            self.possibility_A_to_propose_an_ABC_coalition or
+            self.possibility_B_to_propose_an_ABC_coalition or
+            self.possibility_C_to_propose_an_ABC_coalition)
+
+
+@attr.s(frozen=True)
+class ComprehensionQuestion(object):
+    question = attr.ib(convert=str)
+    choices = attr.ib(convert=tuple)
+    answer = attr.ib(convert=int, validator=answer)
+
+    @property
+    def max_length(self):
+        return max(map(len, self.choices))
+
+    def is_correct(self, a):
+        return self.choices[self.answer] == a
 
 
 # =============================================================================
 # FUNCTIONS
 # =============================================================================
 
-def parse(path):
+def parse_argsfile(path):
     config = configparser.ConfigParser()
     config.optionxform = str
     config.read(path)

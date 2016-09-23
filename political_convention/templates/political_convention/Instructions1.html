@@ -17,7 +17,7 @@
             In these interactions, you will be able to earn points based on your performance.
             At the end of the study, the points that you have acquired will be transformed into a
             real monetary bonus (specify conversion rule). Whereas you always receive your
-            “show-up fee” of $X, you will only earn this extra bonus if you complete all <span class="text-info">{{params.number_of_games}} games</span>
+            “show-up fee” of $X, you will only earn this extra bonus if you complete all <span class="text-info">{{p.number_of_games}} games</span>
             in this study. If you leave the study before the end, you will not receive any bonus payment.
         </p>
         <p>
@@ -29,10 +29,10 @@
         <p>
             As other players are dependent upon your actions, this study requires your full attention.
             Whenever you do nothing for
-            <span class="text-info">{{params.seconds_before_idle_warning_instruction}} seconds</span> (including cursor movement) when you are reading
+            <span class="text-info">{{p.seconds_before_idle_warning_instruction}} seconds</span> (including cursor movement) when you are reading
             instructions or when you are asked to make a decision, you will receive a warning message.
             The same goes for when you have stayed on one page for too long. If you do not respond to this
-            warning message in <span class="text-info">{{params.seconds_before_booted_from_study_after_warning}} seconds</span>,
+            warning message in <span class="text-info">{{p.seconds_before_booted_from_study_after_warning}} seconds</span>,
             you will be excluded from the study. Moreover, you will
             forgot your bonus payment.
 
