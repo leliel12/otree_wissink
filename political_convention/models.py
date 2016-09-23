@@ -37,19 +37,32 @@ class Constants(BaseConstants):
             question="choose eggs!", choices=("foo", "spam", "eggs"), answer=2)
     ]
 
+    pA, pB, pC, leftOver = "A", "B", "C", "LeftOver"
+    positions = (pA, pB, pC, leftOver)
 
+
+# =============================================================================
+# Subsession
+# =============================================================================
 
 class Subsession(BaseSubsession):
     pass
 
 
+# =============================================================================
+# GROUP
+# =============================================================================
 class Group(BaseGroup):
     pass
 
 
+# =============================================================================
+# PLAYER
+# =============================================================================
 class Player(BasePlayer):
-    pass
 
+    kicked = models.BooleanField()
+    position = models.CharField(max_length=10, choices=Constants.positions)
 
 
 for idx, cq in enumerate(Constants.comprehension_questions):

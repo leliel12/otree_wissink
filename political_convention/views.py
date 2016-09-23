@@ -1,4 +1,6 @@
 
+import random
+
 from django.conf import settings
 from otree.api import Currency as c, currency_range
 from . import models
@@ -61,8 +63,32 @@ class ComprehensionCheck(Page):
         return msg
 
 
+class PossitionAssignment(Page):
+    pass
+
+
+class WaitPossitionAssignment(WaitPage):
+
+    title_text = "Possition Assignment"
+    body_text = "Wait until all asignment are done"
+
+    def after_all_players_arrive(self):
+        players = [p for p in self.group.get_players() if not p.kicked]
+        random.shuffle(players)
+        while players:
+            if len(players) >= 3:
+                players.pop().position = Constants.pA
+                players.pop().position = Constants.pB
+                players.pop().position = Constants.pC
+            else:
+                break
+        for player in players:
+            player.position = Constants.leftOver
+
+
 page_sequence = [
-    #~ InformedConsent,
-    #~ Instructions1, Instructions2, Instructions3, Instructions4,
-    #~ PhasesDescription, ComprehensionCheck,
+    InformedConsent,
+    Instructions1, Instructions2, Instructions3, Instructions4,
+    PhasesDescription, ComprehensionCheck,
+    PossitionAssignment, WaitPossitionAssignment
 ]
