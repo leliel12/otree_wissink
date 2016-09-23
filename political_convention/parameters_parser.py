@@ -48,7 +48,7 @@ class Params(object):
     path = attr.ib(convert=str)
     number_of_games = attr.ib(convert=int, validator=gt0)
     seconds_before_idle_warning_instruction = attr.ib(convert=int, validator=ge0)
-    econds_before_warning_too_long_on_page_instruction = attr.ib(convert=int, validator=ge0)
+    seconds_before_warning_too_long_on_page_instruction = attr.ib(convert=int, validator=ge0)
     seconds_before_booted_from_study_after_warning = attr.ib(convert=int, validator=ge0)
     seconds_before_idle_warning_game_1 = attr.ib(convert=int, validator=ge0)
     seconds_before_warning_too_long_game_1 = attr.ib(convert=int, validator=ge0)

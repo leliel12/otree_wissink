@@ -1,0 +1,38 @@
+{% extends "global/Base.html" %}
+{% load staticfiles otree_tags %}
+
+{% block title %}
+    Instructions 2/4
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12 lead">
+        <p>
+            Thank you for waiting. Please read the following information carefully before continuing.You are about to participate in a study
+            in which you interact with other participants. In this study, there are three players: Player A, Player B, and Player C. All participants
+            will be assigned to these positions, so that multiple participants take the position of Player A, multiple participants take the
+            position of Player B, and multiple participants take the position of Player C. The allocation to these positions will be made known at
+            the start of the session (Game 1). Participants assigned to a certain position will have that position for the entire session.
+        </p>
+        <p>
+            The session will be last <span class="text-info">{{params.number_of_games}} games</span>.
+            The number of the current game is displayed in the upper part of the screen.
+        </p>
+        <p>
+            On the next couple of screens, you will read the steps taken in each of the  <span class="text-info">{{params.number_of_games}} games</span>.
+            Please read these instructions carefully.
+        </p>
+        <p>
+            Please press <kbd>Next</kbd> to go to the next screen.
+        </p>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-1 col-md-offset-11">
+    {% next_button %}
+    </div>
+</div>
+
+{% endblock %}

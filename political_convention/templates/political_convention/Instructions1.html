@@ -1,0 +1,53 @@
+{% extends "global/Base.html" %}
+{% load staticfiles otree_tags %}
+
+{% block title %}
+    Instructions 1/4
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12 lead">
+        <p>Dear participant,</p>
+        <p>
+            Thank you for waiting. Please read the following information carefully before continuing.
+        </p>
+        <p>
+            In the next X minutes, you will be interacting with other participants.
+            In these interactions, you will be able to earn points based on your performance.
+            At the end of the study, the points that you have acquired will be transformed into a
+            real monetary bonus (specify conversion rule). Whereas you always receive your
+            “show-up fee” of $X, you will only earn this extra bonus if you complete all <span class="text-info">{{params.number_of_games}} games</span>
+            in this study. If you leave the study before the end, you will not receive any bonus payment.
+        </p>
+        <p>
+            <strong>Note:</strong> Whenever a player you are interacting with drops out
+            (due to connection error or otherwise) you will temporarily play with a computer player.
+            This computer player will make decisions based on how human participants have acted in the past.
+            You will not be notified when you are playing with a computer player.
+        </p>
+        <p>
+            As other players are dependent upon your actions, this study requires your full attention.
+            Whenever you do nothing for
+            <span class="text-info">{{params.seconds_before_idle_warning_instruction}} seconds</span> (including cursor movement) when you are reading
+            instructions or when you are asked to make a decision, you will receive a warning message.
+            The same goes for when you have stayed on one page for too long. If you do not respond to this
+            warning message in <span class="text-info">{{params.seconds_before_booted_from_study_after_warning}} seconds</span>,
+            you will be excluded from the study. Moreover, you will
+            forgot your bonus payment.
+
+        </p>
+        <p>
+            if you accept these terms, please press the <kbd>Next</kbd> button to move to the general instructions.
+
+        </p>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-1 col-md-offset-11">
+    {% next_button %}
+    </div>
+</div>
+
+{% endblock %}

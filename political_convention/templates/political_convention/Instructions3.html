@@ -1,0 +1,37 @@
+{% extends "global/Base.html" %}
+{% load staticfiles otree_tags %}
+
+{% block title %}
+    Instructions 3/4
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12 lead">
+        <p>
+            In this study, we conduct research on how people negotiate and form coalitions.
+        </p>
+        <p>
+            TYou are one of three people negotiating how to allocate a sum of 
+            <span class="text-info">{{params.total_sum_of_outcomes}} points</span>,
+            an outcome that is equally important to all of you. It is important to realize
+            that you are not able to obtain the outcome by yourself and consequently you need to
+            join forces with another individual. This means that you need to form a coalition in which
+            you need to reach an agreement about the allocation of the outcome.
+        </p>
+        <p>
+            On the following page we will explain more about the bargaining position of each person and the possible coalitions.
+        </p>
+        <p>
+            Please press <kbd>Next</kbd> to go to the next screen.
+        </p>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-1 col-md-offset-11">
+    {% next_button %}
+    </div>
+</div>
+
+{% endblock %}

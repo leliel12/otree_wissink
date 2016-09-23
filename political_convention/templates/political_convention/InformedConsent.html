@@ -1,0 +1,30 @@
+{% extends "global/Base.html" %}
+{% load staticfiles otree_tags %}
+
+{% block title %}
+    Informed Consent
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12 lead">
+        <p>Dear participant,</p>
+        <p>
+            Thank you for taking part in this study. In
+            <strong class="text-info">{{wait}}</strong>, you will be
+            automatically forwarded to the instructions of the study.
+        </p>
+        <p>Please make sure you will be ready to start when the timer hits zero.</p>
+    </div>
+</div>
+
+{% if DEBUG %}
+<div class="row">
+    <div class="col-md-12">
+    {{because_debug|safe}}
+    {% next_button %}
+    </div>
+</div>
+{% endif %}
+
+{% endblock %}
