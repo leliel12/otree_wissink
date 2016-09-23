@@ -1,0 +1,24 @@
+{% extends "global/Base.html" %}
+{% load staticfiles otree_tags %}
+
+{% block title %}
+    Possition Assignment
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12 lead">
+        <p>You will now be randomly assigned to the position of Player A, B or C.</p>
+        <p>Pleas presse the next button to be assigned to a position.
+            As all other individuals participating in the experiment are
+            required for this, this may take a few minutes. Thank you for your patience.</p>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-1 col-md-offset-11">
+    {% next_button %}
+    </div>
+</div>
+
+{% endblock %}
