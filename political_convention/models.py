@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import uuid
+
 from django.conf import settings
 
 from otree.api import (
@@ -16,8 +18,6 @@ author = 'Your name here'
 doc = """
 Your app description
 """
-
-
 
 
 class Constants(BaseConstants):
@@ -46,7 +46,12 @@ class Constants(BaseConstants):
 # =============================================================================
 
 class Subsession(BaseSubsession):
-    pass
+
+    def before_session_starts(self):
+        if self.round_number == 1:
+            for player in self.get_players():
+                participant = player.participant
+                participant.vars["secret_key"] = str(uuid.uuid4())
 
 
 # =============================================================================
@@ -64,6 +69,9 @@ class Player(BasePlayer):
     kicked = models.BooleanField()
     position = models.CharField(max_length=10, choices=Constants.positions)
 
+    @property
+    def secret_key(self):
+        return self.participant.vars["secret_key"]
 
 for idx, cq in enumerate(Constants.comprehension_questions):
     Player.add_to_class(

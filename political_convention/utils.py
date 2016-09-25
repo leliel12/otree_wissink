@@ -149,6 +149,10 @@ class Params(object):
             self.possibility_B_to_propose_an_ABC_coalition or
             self.possibility_C_to_propose_an_ABC_coalition)
 
+    def get(self, k, d=None):
+        asdict = attr.asdict(self)
+        return asdict.get(k, d)
+
 
 @attr.s(frozen=True)
 class ComprehensionQuestion(object):

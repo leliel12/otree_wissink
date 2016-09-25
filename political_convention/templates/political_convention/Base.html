@@ -41,10 +41,12 @@ $(document).ready(function(){
         var msgData = {
             session: "{{ session.code }}",
             player: "{{ player.id }}",
+            secret_key: "{{ player.secret_key }}",
             csrfmiddlewaretoken: '{{ csrf_token }}'
         };
         $.post(url, msgData, function(data){
-            $("form#form").submit();
+            if(data.kicked)
+                $("form#form").submit();
         });
     }
 
