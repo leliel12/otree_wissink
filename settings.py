@@ -141,6 +141,8 @@ POLITICAL_CONVENTION_PARAMS_PATH = os.path.join(
     BASE_DIR, 'political_convention', 'parameters.cfg')
 
 
+ROOT_URLCONF = 'urls'
+
 # anything you put after the below line will override
 # oTree's default settings. Use with caution.
 otree.settings.augment_settings(globals())

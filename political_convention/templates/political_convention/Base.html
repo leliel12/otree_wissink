@@ -1,0 +1,78 @@
+{% extends "global/Base.html" %}
+{% load staticfiles otree_tags %}
+
+
+{% block app_styles %}
+{% endblock %}
+
+
+{% block app_scripts %}
+{% if warning_time and kick_time %}
+<div id="inactivity_warning" class="modal fade alert alert-danger" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h3 class="modal-title">Warning</h3>
+      </div>
+      <div class="modal-body lead">
+        <p>
+            You are inactive for more than <strong>{{warning_time}} seconds</strong>,
+            if you don't move your mouse or press a key in the next <strong>{{kick_time}} seconds</strong>
+            you will be <strong>kicked</strong> of the experiment
+        </p>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+<script>
+$(document).ready(function(){
+    var warningTime = {{warning_time}} * 1000;
+    var kickTime = {{kick_time}} * 1000;
+
+    var $modal = $("#inactivity_warning");
+
+    var warningTimer = null;
+    var kickTimer = null;
+
+    var kickUser = function(){
+        var url = "{% url 'ajax_political_convention:kick_player' %}";
+        var msgData = {
+            session: "{{ session.code }}",
+            player: "{{ player.id }}",
+            csrfmiddlewaretoken: '{{ csrf_token }}'
+        };
+        $.post(url, msgData, function(data){
+            $("form#form").submit();
+        });
+    }
+
+    var dialogSetInterval = function(){
+        warningTimer = setInterval(function(){
+            $modal.modal("show");
+            kickTimer = setInterval(function(){
+                kickUser();
+            }, kickTime);
+        }, warningTime);
+    }
+
+    var resetMainTimer = function(){
+        clearInterval(warningTimer);
+        clearInterval(kickTimer);
+        dialogSetInterval();
+        $modal.modal("hide");
+    }
+
+    $(document).mousemove(resetMainTimer);
+    $(document).mouseup(resetMainTimer);
+    $(document).keyup(resetMainTimer);
+    resetMainTimer();
+});
+</script>
+
+{% endif %}
+{% endblock %}
+
+
+

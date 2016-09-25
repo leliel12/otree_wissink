@@ -1,6 +1,10 @@
 
 import random
 
+
+
+from django.views.decorators.http import require_POST
+
 from django.conf import settings
 from otree.api import Currency as c, currency_range
 from . import models
@@ -8,11 +12,28 @@ from ._builtin import Page, WaitPage
 from .models import Constants
 
 
+# =============================================================================
+# FUNCTIONS
+# =============================================================================
+
 def vars_for_all_templates(page):
     return {
         "p": Constants.p,
+        "warning_time": 2,
+        "kick_time": 5,
         "DEBUG": settings.DEBUG,
         "because_debug": "<small>DEBUG is True</small>"}
+
+
+# =============================================================================
+# COMMON VIEWS
+# =============================================================================
+
+@require_POST
+def kick_player(request):
+    session_code = request.POST["session"]
+    player_id = request.POST["player"]
+    import ipdb; ipdb.set_trace()
 
 
 # =============================================================================
