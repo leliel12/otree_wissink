@@ -37,11 +37,11 @@ def kick_player(request):
     player = models.Player.objects.filter(
         session__code=session_code).get(id=player_id)
     if player and player.secret_key == secret_key:
-        player.kicked = True
-        player.save()
+        for p in player.participant.get_players():
+            p.kicked = True
+            p.save()
         return JsonResponse({"kicked": True})
     return JsonResponse({"kicked": False})
-
 
 
 # =============================================================================
@@ -54,7 +54,7 @@ class InformedConsent(Page):
     kick_time = "seconds_before_booted_from_study_after_warning"
 
     def is_displayed(self):
-        return not self.player.kicked
+        return self.subsession.round_number == 1 and not self.player.kicked
 
     def vars_for_template(self):
         return {"wait": "{}:00 minutes".format(int(self.timeout_seconds/60))}
@@ -65,7 +65,7 @@ class Instructions1(Page):
     kick_time = "seconds_before_booted_from_study_after_warning"
 
     def is_displayed(self):
-        return not self.player.kicked
+        return self.subsession.round_number == 1 and not self.player.kicked
 
 
 class Instructions2(Page):
@@ -73,7 +73,7 @@ class Instructions2(Page):
     kick_time = "seconds_before_booted_from_study_after_warning"
 
     def is_displayed(self):
-        return not self.player.kicked
+        return self.subsession.round_number == 1 and not self.player.kicked
 
 
 class Instructions3(Page):
@@ -81,7 +81,7 @@ class Instructions3(Page):
     kick_time = "seconds_before_booted_from_study_after_warning"
 
     def is_displayed(self):
-        return not self.player.kicked
+        return self.subsession.round_number == 1 and not self.player.kicked
 
 
 class Instructions4(Page):
@@ -89,7 +89,7 @@ class Instructions4(Page):
     kick_time = "seconds_before_booted_from_study_after_warning"
 
     def is_displayed(self):
-        return not self.player.kicked
+        return self.subsession.round_number == 1 and not self.player.kicked
 
 
 class PhasesDescription(Page):
@@ -97,7 +97,7 @@ class PhasesDescription(Page):
     kick_time = "seconds_before_booted_from_study_after_warning"
 
     def is_displayed(self):
-        return not self.player.kicked
+        return self.subsession.round_number == 1 and not self.player.kicked
 
 
 class ComprehensionCheck(Page):
@@ -110,7 +110,7 @@ class ComprehensionCheck(Page):
         for idx in range(len(Constants.comprehension_questions))]
 
     def is_displayed(self):
-        return not self.player.kicked
+        return self.subsession.round_number == 1 and not self.player.kicked
 
     def error_message(self, values):
         msg = []
@@ -127,7 +127,7 @@ class PossitionAssignment(Page):
     kick_time = "seconds_before_booted_from_study_after_warning"
 
     def is_displayed(self):
-        return not self.player.kicked
+        return self.subsession.round_number == 1 and not self.player.kicked
 
 
 class WaitPossitionAssignment(WaitPage):
@@ -138,20 +138,33 @@ class WaitPossitionAssignment(WaitPage):
     kick_time = None
 
     def is_displayed(self):
-        return not self.player.kicked
+        return self.subsession.round_number == 1 and not self.player.kicked
+
+    def assign_position(self, player, position):
+        for p in player.participant.get_players():
+            p.position = position
 
     def after_all_players_arrive(self):
         players = [p for p in self.group.get_players() if not p.kicked]
         random.shuffle(players)
         while players:
             if len(players) >= 3:
-                players.pop().position = Constants.pA
-                players.pop().position = Constants.pB
-                players.pop().position = Constants.pC
+                self.assign_position(players.pop(), Constants.pA)
+                self.assign_position(players.pop(), Constants.pB)
+                self.assign_position(players.pop(), Constants.pC)
             else:
                 break
         for player in players:
-            player.position = Constants.leftOver
+            self.assign_position(player, Constants.leftOver)
+
+
+class PositionAssignmentResult(Page):
+    warning_time = "seconds_before_idle_warning_game_1"
+    kick_time = "seconds_before_booted_from_study_after_warning"
+
+    def is_displayed(self):
+        return self.subsession.round_number == 1 and not self.player.kicked
+
 
 
 class Kicked(Page):
@@ -163,10 +176,12 @@ class Kicked(Page):
 
 
 page_sequence = [
-    InformedConsent,
-    Instructions1, Instructions2, Instructions3, Instructions4,
-    PhasesDescription, ComprehensionCheck,
-    PossitionAssignment, WaitPossitionAssignment,
+    #~ InformedConsent,
+    #~ Instructions1, Instructions2, Instructions3, Instructions4,
+    #~ PhasesDescription, ComprehensionCheck,
+
+    #~ PossitionAssignment,
+    WaitPossitionAssignment, PositionAssignmentResult,
 
     Kicked
 ]

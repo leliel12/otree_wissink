@@ -23,7 +23,7 @@ Your app description
 class Constants(BaseConstants):
     name_in_url = 'political_convention'
     players_per_group = None
-    num_rounds = 1
+    num_rounds = 3
 
     p_path = settings.POLITICAL_CONVENTION_PARAMS_PATH
     p = utils.parse_argsfile(p_path)
