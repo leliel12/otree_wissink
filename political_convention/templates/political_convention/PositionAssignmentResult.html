@@ -1,0 +1,28 @@
+{% extends "political_convention/Base.html" %}
+{% load staticfiles otree_tags %}
+
+{% block title %}
+    You are Player {{player.position}}
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12 lead">
+        <p>
+            As mentioned earlier, you will play multiple games as either
+            Player A, Player B, and Player C. One game contains multiple phases,
+            which will are explained below.
+        </p>
+        <p>
+            Please press <kbd>Next</kbd> to go to the next screen.
+        </p>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-1 col-md-offset-11">
+    {% next_button %}
+    </div>
+</div>
+
+{% endblock %}
