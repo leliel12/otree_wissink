@@ -133,6 +133,7 @@ class PossitionAssignment(Page):
 class WaitPossitionAssignment(WaitPage):
     title_text = "Possition Assignment"
     body_text = "Wait until all asignment are done"
+    wait_for_all_groups = True
 
     warning_time = None
     kick_time = None
@@ -140,22 +141,41 @@ class WaitPossitionAssignment(WaitPage):
     def is_displayed(self):
         return self.subsession.round_number == 1 and not self.player.kicked
 
-    def assign_position(self, player, position):
-        for p in player.participant.get_players():
-            p.position = position
+    def assign_all_positions(self, players):
+        def assign_player_position(player, position, group):
+            for p in player.participant.get_players():
+                p.position = position
+            group.append(player)
 
-    def after_all_players_arrive(self):
-        players = [p for p in self.group.get_players() if not p.kicked]
+        pas, pbs, pcs = [], [], []
+        players = list(players)
         random.shuffle(players)
         while players:
             if len(players) >= 3:
-                self.assign_position(players.pop(), Constants.pA)
-                self.assign_position(players.pop(), Constants.pB)
-                self.assign_position(players.pop(), Constants.pC)
+                assign_position(players.pop(), Constants.pA, pas)
+                assign_position(players.pop(), Constants.pB, pbs)
+                assign_position(players.pop(), Constants.pC, pcs)
             else:
                 break
         for player in players:
-            self.assign_position(player, Constants.leftOver)
+            assign_position(player, Constants.leftOver, [])
+        return pas, pbs, pcs
+
+    def after_all_players_arrive(self):
+        players = [p for p in self.group.get_players() if not p.kicked]
+        players_as, players_bs, players_cs, = self.assign_all_positions(players)
+        for subsession in self.subsession.in_rounds(1, Constants.num_rounds):
+            round_n = subsession.round_number
+            pas = [p.in_round(round_n) for p in players_as]
+            pbs = [p.in_round(round_n) for p in players_bs]
+            pcs = [p.in_round(round_n) for p in players_cs]
+            random.shuffle(pas)
+            random.shuffle(pbs)
+            random.shuffle(pac)
+            group_matrix = [
+                [a, b, c]
+                for a, b, c in zip(pas, pbs, pcs)]
+            subsession.set_group_matrix(group_matrix)
 
 
 class PositionAssignmentResult(Page):
