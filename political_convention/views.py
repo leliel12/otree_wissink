@@ -167,10 +167,7 @@ class PositionAssignmentResult(Page):
     kick_time = "seconds_before_booted_from_study_after_warning"
 
     def is_displayed(self):
-        import ipdb; ipdb.set_trace()
-        return (
-            self.subsession.round_number == 1 and not
-            self.player.kicked_or_left_over)
+        return not self.player.kicked_or_left_over()
 
 
 
@@ -188,7 +185,8 @@ page_sequence = [
     #~ PhasesDescription, ComprehensionCheck,
 
     #~ PossitionAssignment,
-    WaitPossitionAssignment, PositionAssignmentResult,
+    WaitPossitionAssignment,
+    PositionAssignmentResult,
 
     Kicked
 ]

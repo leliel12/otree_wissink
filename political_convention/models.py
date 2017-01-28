@@ -39,7 +39,7 @@ class Constants(BaseConstants):
             question="choose eggs!", choices=("foo", "spam", "eggs"), answer=2)
     ]
 
-    pA, pB, pC, pK = "A", "B", "C", "Kicked"
+    pA, pB, pC, pK, leftOver = "A", "B", "C", "Kicked", "leftOver"
     positions = (pA, pB, pC)
 
 
@@ -95,7 +95,7 @@ class Player(BasePlayer):
         return self.position == Constants.leftOver
 
     def kicked_or_left_over(self):
-        return self.kicked or self.left_over
+        return self.kicked or self.left_over()
 
     @property
     def secret_key(self):
