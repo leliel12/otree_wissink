@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import random
+import itertools as it
 import uuid
 
 from django.conf import settings
@@ -37,8 +39,8 @@ class Constants(BaseConstants):
             question="choose eggs!", choices=("foo", "spam", "eggs"), answer=2)
     ]
 
-    pA, pB, pC, leftOver = "A", "B", "C", "LeftOver"
-    positions = (pA, pB, pC, leftOver)
+    pA, pB, pC, pK = "A", "B", "C", "Kicked"
+    positions = (pA, pB, pC)
 
 
 # =============================================================================
@@ -48,10 +50,30 @@ class Constants(BaseConstants):
 class Subsession(BaseSubsession):
 
     def before_session_starts(self):
+        positions = it.cycle(Constants.positions)
         if self.round_number == 1:
-            for player in self.get_players():
-                participant = player.participant
+            participants = [p.participant for p in self.get_players()]
+            random.shuffle(participants)
+            for participant in participants:
                 participant.vars["secret_key"] = str(uuid.uuid4())
+                position = next(positions)
+                for player in participant.get_players():
+                    player.position = position
+
+    def players_by_position(self):
+        pas, pbs, pcs, ks = [], [], [], []
+        for player in self.get_players():
+            if player.kicked:
+                ks.append(player)
+            elif player.position == Constants.pA:
+                pas.append(player)
+            elif player.position == Constants.pB:
+                pbs.append(player)
+            elif player.position == Constants.pC:
+                pcs.append(player)
+        return pas, pbs, pcs, ks
+
+
 
 
 # =============================================================================
@@ -68,6 +90,12 @@ class Player(BasePlayer):
 
     kicked = models.BooleanField()
     position = models.CharField(max_length=10, choices=Constants.positions)
+
+    def left_over(self):
+        return self.position == Constants.leftOver
+
+    def kicked_or_left_over(self):
+        return self.kicked or self.left_over
 
     @property
     def secret_key(self):
