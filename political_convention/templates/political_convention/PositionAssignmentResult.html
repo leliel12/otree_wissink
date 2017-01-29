@@ -9,10 +9,21 @@
 <div class="row">
     <div class="col-md-12 lead">
         <p>
-            As mentioned earlier, you will play multiple games as either
-            Player A, Player B, and Player C. One game contains multiple phases,
-            which will are explained below.
+            You have been assigned to the position of
+            <strong class="text-info">Player {{player.position}}</strong>,
+            meaning that you have <strong class="text-info">{{player.votes}} votes</strong>.
+            You will hold this position over all games  in the session.
         </p>
+        <p>To reiterate: your bargaining partners are
+            {% for p in player.get_others_in_group %}
+            <strong class="text-success">Player {{p.position}}</strong>
+            (holding <strong class="text-success">{{p.votes}} votes</strong>)
+            {% if not forloop.last %}and{% else %}{% endif %}
+            {% endfor %}
+            If you form a coalition with at least
+            <strong class="text-danger">{{Constants.p.votes_necessary_for_coalition}} votes</strong>,
+            you will gain a
+            share of the outcomes as agreed on.
         <p>
             Please press <kbd>Next</kbd> to go to the next screen.
         </p>

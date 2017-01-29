@@ -23,7 +23,8 @@ def vars_for_all_templates(page):
         "warning_time": Constants.p.get(page.warning_time),
         "kick_time": Constants.p.get(page.kick_time),
         "DEBUG": settings.DEBUG,
-        "because_debug": "<small>DEBUG is True</small>"}
+        "because_debug": "<small>DEBUG is True</small>",
+        "kick_warning": False}
 
 
 # =============================================================================
@@ -131,7 +132,6 @@ class PossitionAssignment(Page):
         return self.subsession.round_number == 1 and not self.player.kicked
 
 
-
 class WaitPossitionAssignment(WaitPage):
     title_text = "Possition Assignment"
     body_text = "Wait until all asignment are done"
@@ -166,8 +166,27 @@ class PositionAssignmentResult(Page):
     warning_time = "seconds_before_idle_warning_game_1"
     kick_time = "seconds_before_booted_from_study_after_warning"
 
+    def vars_for_template(self):
+        others = self.player.get_others_in_group()
+        others.sort(key=lambda p: p.position)
+        return {"others": others}
+
     def is_displayed(self):
-        return not self.player.kicked_or_left_over()
+        return (
+            self.subsession.round_number == 1 and not
+            self.player.kicked_or_left_over())
+
+
+class Bargaining(Page):
+    warning_time = "seconds_before_idle_warning_game_1"
+    kick_time = "seconds_before_booted_from_study_after_warning"
+
+    form_model = models.Player
+    form_fields = ["coalition_with"]
+
+    #~ def vars_for_template(self):
+        #~ position
+
 
 
 
@@ -186,7 +205,9 @@ page_sequence = [
 
     #~ PossitionAssignment,
     WaitPossitionAssignment,
-    PositionAssignmentResult,
+    #~ PositionAssignmentResult,
+
+    Bargaining,
 
     Kicked
 ]

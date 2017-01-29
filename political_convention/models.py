@@ -9,8 +9,10 @@ from django.conf import settings
 
 from otree.api import (
     models, widgets, BaseConstants, BaseSubsession, BaseGroup, BasePlayer,
-    Currency as c, currency_range, safe_json
+    Currency as c, currency_range, safe_json,
 )
+
+from otree.db.serializedfields import JSONField
 
 from . import utils
 
@@ -86,10 +88,20 @@ class Group(BaseGroup):
 # =============================================================================
 # PLAYER
 # =============================================================================
+
 class Player(BasePlayer):
 
     kicked = models.BooleanField()
     position = models.CharField(max_length=10, choices=Constants.positions)
+    coalition_with = models.CharField(max_length=2)
+    offer_player_A = models.CurrencyField()
+    offer_player_B = models.CurrencyField()
+    offer_player_C = models.CurrencyField()
+
+    def get_others_in_group(self):
+        others = super(Player, self).get_others_in_group()
+        others.sort(key=lambda p: p.position)
+        return others
 
     def left_over(self):
         return self.position == Constants.leftOver
@@ -100,6 +112,25 @@ class Player(BasePlayer):
     @property
     def secret_key(self):
         return self.participant.vars["secret_key"]
+
+    def coalitions_allowed(self):
+        not_me = [p for p in Constants.positions if p not in self.position]
+        not_me.append("".join(not_me))
+        allowed = []
+        for coalition in not_me:
+            key = "".join(sorted(self.position + coalition))
+            attr_name = "possibility_{}_to_propose_an_{}_coalition".format(
+                self.position, key)
+            if getattr(Constants.p, attr_name):
+                allowed.append(coalition)
+        return [(" and ".join(a), a) for a in allowed]
+
+
+
+
+
+    def votes(self):
+        return getattr(Constants.p, "votes_player_{}".format(self.position))
 
 for idx, cq in enumerate(Constants.comprehension_questions):
     Player.add_to_class(

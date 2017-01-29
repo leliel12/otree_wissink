@@ -66,10 +66,12 @@ $(document).ready(function(){
         $modal.modal("hide");
     }
 
+    {% if kick_warning %}
     $(document).mousemove(resetMainTimer);
     $(document).mouseup(resetMainTimer);
     $(document).keyup(resetMainTimer);
     resetMainTimer();
+    {% endif %}
 });
 </script>
 
