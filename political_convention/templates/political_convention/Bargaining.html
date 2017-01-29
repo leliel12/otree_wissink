@@ -1,0 +1,33 @@
+{% extends "political_convention/Base.html" %}
+{% load staticfiles otree_tags %}
+
+{% block title %}
+    Bargaining - Round {{subsession.round_number}}/{{Constants.num_rounds}} - {{player.position}}
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12 lead">
+        <p>Send an offer to the player(s) you want to form a coalition with
+           by indicating how much points you want to keep and how many points
+           you want to offer the other player(s) when forming a coalition.
+        </p>
+        <p>Please select with whom you want to form a coalition</p>
+        <p>I want to form a coalition with:</p>
+        <ul>
+        {% for label, coalition in player.coalitions_allowed %}
+            <li>
+                <input type="radio" name="coalition_with" value="{{coalition}}" required> {{label}}
+            </li>
+        {% endfor %}
+        </ul>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-1 col-md-offset-11">
+    {% next_button %}
+    </div>
+</div>
+
+{% endblock %}
