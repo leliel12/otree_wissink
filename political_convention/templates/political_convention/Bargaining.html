@@ -2,32 +2,185 @@
 {% load staticfiles otree_tags %}
 
 {% block title %}
-    Bargaining - Round {{subsession.round_number}}/{{Constants.num_rounds}} - {{player.position}}
+    Sugest Your Coalition - Round {{subsession.round_number}}/{{Constants.num_rounds}}
+{% endblock %}
+
+{% block styles %}
+<style>
+    ul#offers div.form-group {
+        margin-left: 50px;
+    }
+
+    ul#offers div.form-group,
+    ul#offers div.controls,
+    ul#offer div.input-group {
+        display: inline-block;
+
+    }
+</style>
+
 {% endblock %}
 
 {% block content %}
-<div class="row">
-    <div class="col-md-12 lead">
-        <p>Send an offer to the player(s) you want to form a coalition with
-           by indicating how much points you want to keep and how many points
-           you want to offer the other player(s) when forming a coalition.
-        </p>
-        <p>Please select with whom you want to form a coalition</p>
-        <p>I want to form a coalition with:</p>
-        <ul>
-        {% for label, coalition in player.coalitions_allowed %}
-            <li>
-                <input type="radio" name="coalition_with" value="{{coalition}}" required> {{label}}
-            </li>
-        {% endfor %}
-        </ul>
+<div id="bargain">
+    <div class="row">
+        <div class="col-md-12 lead">
+            <p>Send an offer to the player(s) you want to form a coalition with
+               by indicating how much points you want to keep and how many points
+               you want to offer the other player(s) when forming a coalition.
+            </p>
+            <p>Please select with whom you want to form a coalition</p>
+            <p>I want to form a coalition with:</p>
+            <ul>
+            {% for label, coalition in player.coalitions_allowed %}
+                <li>
+                    <input data-desc="{{label}}" type="radio" name="sugest_coalition_with" value="{{coalition}}" required> {{label}}
+                </li>
+            {% endfor %}
+            </ul>
+            <p>Pleade indicate what offer in termes of divided points is (total should be {{p.total_sum_of_outcomes}})</p>
+            <p id="total-alert" class="alert alert-warning text-normal" style="display:none">
+                Total points should be {{p.total_sum_of_outcomes}}, Found:
+                <span id="total-offers"></span>
+            </p>
+            <ul id="offers">
+                <li class="{% if player.position == Constants.pA %}you{% endif %}">
+                    Player A {% formfield player.offer_player_A with label="" %}
+                    {% if player.position == Constants.pA %}<small class="text-info">(You)</small>{% endif %}
+                </li>
+                <li class="{% if player.position == Constants.pB %}you{% endif %}">
+                    Player B {% formfield player.offer_player_B with label="" %}
+                    {% if player.position == Constants.pB %}<small class="text-info">(You)</small>{% endif %}
+                </li>
+                <li class="{% if player.position == Constants.pC %}you{% endif %}">
+                    Player C {% formfield player.offer_player_C with label="" %}
+                    {% if player.position == Constants.pC %}<small class="text-info">(You)</small>{% endif %}
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-1 col-md-offset-11">
+            <button id="show-confirm" class="btn btn-primary btn-large btn-primary">
+                Next
+            </button>
+        </div>
+    </div>
+</div> <!-- bargain -->
+
+<div id="confirm" style="display: none;">
+    <div class="row">
+        <div class="col-md-12 lead">
+            <p>You have proposed the following offer:</p>
+            <p>
+                A coalition between <span id="coalition-desc"></span>;
+                in wich you get <strong id="you-get" class="text-info"></strong>
+                <span id="another-get"></span>.
+            </p>
+
+            <div class="well">
+                <p>Are you sure you want to sent this offer?</p>
+            </div>
+            <ul id="confirmation">
+                <li><input type="radio" name="confirmation" value="yes" required="" disabled> Yes</li>
+                <li><input type="radio" name="confirmation" value="no" required="" disabled> No</li>
+            </ul>
+        </div>
+    </div>
+    <div class="row" >
+        <div class="col-md-1 col-md-offset-11">
+            <button id="real-submit" class="btn btn-primary btn-large btn-primary">
+                Next
+            </button>
+        </div>
     </div>
 </div>
-
-<div class="row">
-    <div class="col-md-1 col-md-offset-11">
-    {% next_button %}
-    </div>
-</div>
-
 {% endblock %}
+
+
+{% block scripts %}
+<script>
+$(document).ready(function(){
+    var form = $("form#form")[0];
+    var $bargain = $("div#bargain");
+    var $confirm = $("div#confirm");
+    var $totalAlert = $("p#total-alert");
+    var $confirmation = $("#confirmation input");
+
+    function totalOffered(){
+        var total = 0;
+        $("#offers input").each(function(idx, elem){
+            total += parseInt($(elem).val(), 10);
+        });
+        return total;
+    }
+
+    function fillConfirm(){
+        var coalitionWith = $('input[name=sugest_coalition_with]:checked').data("desc");
+        var youGet = $("#offers li.you input").val() + " points";
+        var desc = "";
+        var anotherGet = "";
+        if(coalitionWith.length == 1){
+            desc = "you and Player " + coalitionWith;
+            anotherGet = (
+                "and Player " + coalitionWith +
+                " get <strong class='text-success'>" +
+                $("#id_offer_player_" + coalitionWith).val() + " points</strong>");
+        } else {
+            desc = "you, Player " + coalitionWith;
+            var coalitions = coalitionWith.split(" and ");
+            anotherGet = (
+                ", Player " + coalitions[0] + " get <strong class='text-warning'>" +
+                $("#id_offer_player_" + coalitions[0]).val() + " points</strong> and " +
+                "Player " + coalitions[1] + " get <strong class='text-success'>" +
+                $("#id_offer_player_" + coalitions[1]).val() + " points</strong>");
+        }
+
+        $("#you-get").text(youGet);
+        $("#another-get").html(anotherGet);
+        $("#coalition-desc").text(desc);
+    }
+
+    $("button#show-confirm").click(function(evt){
+        evt.preventDefault();
+        if(form.checkValidity()){
+            var total = totalOffered();
+            if (total == {{p.total_sum_of_outcomes}}) {
+                fillConfirm();
+                $confirmation.prop("disabled", false);
+                $bargain.hide();
+                $totalAlert.hide();
+                $confirm.show();
+            } else {
+                $("#total-offers").text(total);
+                $totalAlert.show("fast");
+            }
+        } else {
+            form.reportValidity();
+        }
+        return false;
+    });
+
+    $("button#real-submit").click(function(evt){
+        evt.preventDefault();
+        if(form.checkValidity()){
+            $confirmation.prop("disabled", true);
+            var next = ($("input[name=confirmation]:checked").val() == "yes");
+            if(next){
+                form.submit();
+            } else {
+                $confirm.hide();
+                $totalAlert.hide();
+                $bargain.show();
+            }
+        } else {
+            form.reportValidity();
+        }
+        return false;
+    });
+
+});
+</script>
+{% endblock %}
+
+

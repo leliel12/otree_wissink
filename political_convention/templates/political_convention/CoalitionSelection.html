@@ -1,0 +1,52 @@
+{% extends "political_convention/Base.html" %}
+{% load staticfiles otree_tags %}
+
+{% block title %}
+    Coalition Selection - Round {{subsession.round_number}}/{{Constants.num_rounds}}
+{% endblock %}
+
+{% block styles %}
+<style>
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <table class="table table-hover">
+            <thead>
+                <th>Player making offer</th>
+                <th>Proposed Coalition</th>
+                <th>Payoff Player A</th>
+                <th>Payoff Player B</th>
+                <th>Payoff Player C</th>
+            </thead>
+            <tbody>
+                {% for p in group.get_players %}
+                <tr>
+                    <td>
+                        Player {{p.position}}
+                        {% if p == player %}
+                        <strong class="text-info">(You)</strong>
+                        {% endif %}
+                    </td>
+                    <td>{{p.sugest_coalition_with}}</td>
+                    <td>{{p.offer_player_A}}</td>
+                    <td>{{p.offer_player_B}}</td>
+                    <td>{{p.offer_player_C}}</td>
+                </tr>
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-1 col-md-offset-11">
+        {% next_button %}
+    </div>
+</div>
+{% endblock %}
+

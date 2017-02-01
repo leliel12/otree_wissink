@@ -82,7 +82,11 @@ class Subsession(BaseSubsession):
 # GROUP
 # =============================================================================
 class Group(BaseGroup):
-    pass
+
+    def get_players(self):
+        players = super(Group, self).get_players()
+        players.sort(key=lambda p: p.position)
+        return players
 
 
 # =============================================================================
@@ -93,10 +97,12 @@ class Player(BasePlayer):
 
     kicked = models.BooleanField()
     position = models.CharField(max_length=10, choices=Constants.positions)
-    coalition_with = models.CharField(max_length=2)
+    sugest_coalition_with = models.CharField(max_length=3)
     offer_player_A = models.CurrencyField()
     offer_player_B = models.CurrencyField()
     offer_player_C = models.CurrencyField()
+
+    coalition_selected = models.CharField(max_length=3)
 
     def get_others_in_group(self):
         others = super(Player, self).get_others_in_group()
@@ -113,6 +119,18 @@ class Player(BasePlayer):
     def secret_key(self):
         return self.participant.vars["secret_key"]
 
+    def possibility_to_give_in_coalitions(self):
+        coalitions = [
+            "".join(c) for c in it.combinations(Constants.positions, 2)
+        ] + ["".join(Constants.positions)]
+        allowed = []
+        for c in coalitions:
+            attr_name = "possibility_to_give_{}_money_in_an_{}_coalition".format(
+                self.position, c)
+            if getattr(Constants.p, attr_name):
+                allowed.append(c)
+        return allowed
+
     def coalitions_allowed(self):
         not_me = [p for p in Constants.positions if p not in self.position]
         not_me.append("".join(not_me))
@@ -123,11 +141,9 @@ class Player(BasePlayer):
                 self.position, key)
             if getattr(Constants.p, attr_name):
                 allowed.append(coalition)
-        return [(" and ".join(a), a) for a in allowed]
-
-
-
-
+        return [
+            (" and ".join(a), "".join(sorted(self.position + a)))
+            for a in allowed]
 
     def votes(self):
         return getattr(Constants.p, "votes_player_{}".format(self.position))

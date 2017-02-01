@@ -23,8 +23,7 @@ def vars_for_all_templates(page):
         "warning_time": Constants.p.get(page.warning_time),
         "kick_time": Constants.p.get(page.kick_time),
         "DEBUG": settings.DEBUG,
-        "because_debug": "<small>DEBUG is True</small>",
-        "kick_warning": False}
+        "because_debug": "<small>DEBUG is True</small>"}
 
 
 # =============================================================================
@@ -182,12 +181,34 @@ class Bargaining(Page):
     kick_time = "seconds_before_booted_from_study_after_warning"
 
     form_model = models.Player
-    form_fields = ["coalition_with"]
+    form_fields = [
+        "sugest_coalition_with",
+        "offer_player_A", "offer_player_B", "offer_player_C"]
 
-    #~ def vars_for_template(self):
-        #~ position
+    def is_displayed(self):
+        return not self.player.kicked_or_left_over()
 
 
+class WaitForBargaing(WaitPage):
+    title_text = "Wait For all Players Proposals"
+    body_text = "Wait until all players are done with their coalition proposals"
+
+    warning_time = None
+    kick_time = None
+
+    def is_displayed(self):
+        return not self.player.kicked_or_left_over()
+
+
+class CoalitionSelection(Page):
+    warning_time = "seconds_before_idle_warning_game_1"
+    kick_time = "seconds_before_booted_from_study_after_warning"
+
+    form_model = models.Player
+    form_fields = ["coalition_selected"]
+
+    def is_displayed(self):
+        return not self.player.kicked_or_left_over()
 
 
 class Kicked(Page):
@@ -195,7 +216,9 @@ class Kicked(Page):
     kick_time = None
 
     def is_displayed(self):
-        return self.player.kicked
+        return (
+            self.player.kicked and
+            self.subsession.round_number == Constants.num_rounds)
 
 
 page_sequence = [
@@ -208,6 +231,8 @@ page_sequence = [
     #~ PositionAssignmentResult,
 
     Bargaining,
+    WaitForBargaing,
+    CoalitionSelection,
 
     Kicked
 ]

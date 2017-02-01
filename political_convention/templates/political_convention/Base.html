@@ -66,7 +66,7 @@ $(document).ready(function(){
         $modal.modal("hide");
     }
 
-    {% if kick_warning %}
+    {% if p.enable_warning_and_kick %}
     $(document).mousemove(resetMainTimer);
     $(document).mouseup(resetMainTimer);
     $(document).keyup(resetMainTimer);
