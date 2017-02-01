@@ -211,6 +211,29 @@ class CoalitionSelection(Page):
         return not self.player.kicked_or_left_over()
 
 
+class WaitForCoalitionSelection(WaitPage):
+    title_text = "Wait For all Players Proposals"
+    body_text = "Wait until all players are done with their coalition proposals"
+
+    warning_time = None
+    kick_time = None
+
+    def is_displayed(self):
+        return not self.player.kicked_or_left_over()
+
+    def after_all_players_arrive(self):
+        self.group.select_coalition()
+
+
+class Result(Page):
+
+    warning_time = "seconds_before_idle_warning_game_1"
+    kick_time = "seconds_before_booted_from_study_after_warning"
+
+    def is_displayed(self):
+        return not self.player.kicked_or_left_over()
+
+
 class Kicked(Page):
     warning_time = None
     kick_time = None
@@ -233,6 +256,8 @@ page_sequence = [
     Bargaining,
     WaitForBargaing,
     CoalitionSelection,
+    WaitForCoalitionSelection,
+    Result,
 
     Kicked
 ]

@@ -83,10 +83,31 @@ class Subsession(BaseSubsession):
 # =============================================================================
 class Group(BaseGroup):
 
+    coalition_selected = models.IntegerField()
+
     def get_players(self):
         players = super(Group, self).get_players()
         players.sort(key=lambda p: p.position)
         return players
+
+    def select_coalition(self):
+        votes = {}
+        for player in self.get_players():
+            cs = player.coalition_selected
+            votes[cs] = votes.setdefault(cs, 0) + player.votes()
+
+        # remove all coalitions below the threshold
+        threshold = Constants.p.votes_necessary_for_coalition
+        votes_filtered = {k: v for k, v in votes.items() if v >= threshold}
+
+        # now sort by votes
+        if votes_filtered:
+            votes_list = list(votes_filtered.items())
+            votes_list.sort(key=lambda e: e[1])
+            self.coalition_selected = votes_list[0][0]
+
+    def coalition_sugestor(self):
+        return Player.objects.get(id=self.coalition_selected)
 
 
 # =============================================================================
@@ -102,18 +123,31 @@ class Player(BasePlayer):
     offer_player_B = models.CurrencyField()
     offer_player_C = models.CurrencyField()
 
-    coalition_selected = models.CharField(max_length=3)
+    # this store the id of the creator of the coalition
+    coalition_selected = models.IntegerField()
+
+    def coalition_sugestor(self):
+        return Player.objects.get(id=self.coalition_selected)
 
     def get_others_in_group(self):
         others = super(Player, self).get_others_in_group()
         others.sort(key=lambda p: p.position)
         return others
 
+    def offer_resume(self):
+        offers = (self.offer_player_A, self.offer_player_B, self.offer_player_C)
+        offers_int = map(int, offers)
+        offers_str = map(str, offers_int)
+        return "-".join(offers_str)
+
     def left_over(self):
         return self.position == Constants.leftOver
 
     def kicked_or_left_over(self):
         return self.kicked or self.left_over()
+
+    def who_votes_me(self):
+        return [p for p in self.group.get_players() if p.coalition_selected == self.id]
 
     @property
     def secret_key(self):
