@@ -131,7 +131,7 @@ SESSION_CONFIGS = [
     {
         'name': 'political_convention',
         'display_name': "Political Convention",
-        'num_demo_participants': 3,
+        'num_demo_participants': 4,
         'app_sequence': ['political_convention'],
 
     },

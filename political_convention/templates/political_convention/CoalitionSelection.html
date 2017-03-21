@@ -45,14 +45,11 @@
     <div class="col-md-12">
         <p class="text-info">Please Select which coalition you want to form:</p>
         <ul>
-            {% for p in group.get_players %}
-                {% if player.position in p.sugest_coalition_with %}
-                <li>
-                    <input required type="radio" name="coalition_selected" value="{{p.id}}">
-                    {{p.sugest_coalition_with}} Coalition
-                    ({{p.offer_resume}})
-                </li>
-                {% endif %}
+            {% for cw, or, pid in sugestions %}
+            <li>
+                <input required type="radio" name="coalition_selected" value="pid">
+                {{cw}} Coalition ({{or}})
+            </li>
             {% endfor %}
         </ul>
     </div>
