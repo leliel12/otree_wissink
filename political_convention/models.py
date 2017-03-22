@@ -117,6 +117,7 @@ class Group(BaseGroup):
 class Player(BasePlayer):
 
     kicked = models.BooleanField()
+    left_over = models.BooleanField()
     position = models.CharField(max_length=10, choices=Constants.positions)
     sugest_coalition_with = models.CharField(max_length=3)
     offer_player_A = models.CurrencyField()
@@ -125,6 +126,7 @@ class Player(BasePlayer):
 
     # this store the id of the creator of the coalition
     coalition_selected = models.IntegerField()
+
 
     def coalition_sugestor(self):
         return Player.objects.get(id=self.coalition_selected)
@@ -140,11 +142,8 @@ class Player(BasePlayer):
         offers_str = map(str, offers_int)
         return "-".join(offers_str)
 
-    def left_over(self):
-        return self.position == Constants.leftOver
-
     def kicked_or_left_over(self):
-        return self.kicked or self.left_over()
+        return self.kicked or self.left_over
 
     def who_votes_me(self):
         return [p for p in self.group.get_players() if p.coalition_selected == self.id]

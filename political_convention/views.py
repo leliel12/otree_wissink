@@ -158,7 +158,10 @@ class WaitPossitionAssignment(WaitPage):
                 group_matrix.append(row)
         if kicked:
             group_matrix.append(kicked)
-        import ipdb; ipdb.set_trace()
+        for g in group_matrix:
+            if len(g) != 3:
+                for p in g:
+                    p.left_over = True
         self.subsession.set_group_matrix(group_matrix)
 
 
@@ -244,6 +247,14 @@ class Result(Page):
         return not self.player.kicked_or_left_over()
 
 
+class LeftOver(Page):
+    warning_time = None
+    kick_time = None
+
+    def is_displayed(self):
+        return self.player.left_over and not self.player.kicked
+
+
 class Kicked(Page):
     warning_time = None
     kick_time = None
@@ -255,11 +266,11 @@ class Kicked(Page):
 
 
 page_sequence = [
-    #~ InformedConsent,
-    #~ Instructions1, Instructions2, Instructions3, Instructions4,
-    #~ PhasesDescription, ComprehensionCheck,
+    InformedConsent,
+    Instructions1, Instructions2, Instructions3, Instructions4,
+    PhasesDescription, ComprehensionCheck,
 
-    #~ PossitionAssignment,
+    PossitionAssignment,
     WaitPossitionAssignment,
     PositionAssignmentResult,
 
@@ -268,6 +279,8 @@ page_sequence = [
     CoalitionSelection,
     WaitForCoalitionSelection,
     Result,
+
+    LeftOver,
 
     Kicked
 ]

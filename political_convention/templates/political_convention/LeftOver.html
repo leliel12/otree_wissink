@@ -1,0 +1,21 @@
+{% extends "global/Base.html" %}
+{% load staticfiles otree_tags %}
+
+{% block title %}
+    You are Left Over of Round {{subsession.round_number}}/{{Constants.num_rounds}}
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12 lead text-center">
+        <p class="text-info">Press <kbd>Next</kbd> and wait until next round</p>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-1 col-md-offset-11">
+        <button id="real-submit" class="btn btn-primary btn-large btn-primary">
+            Next
+        </button>
+    </div>
+</div>
+{% endblock %}
