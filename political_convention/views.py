@@ -180,9 +180,15 @@ class PositionAssignmentResult(Page):
             self.player.kicked_or_left_over())
 
 
+# =============================================================================
+# CYCLE
+# =============================================================================
+
 class Bargaining(Page):
     warning_time = "seconds_before_idle_warning_game_1"
     kick_time = "seconds_before_booted_from_study_after_warning"
+    template_name = "political_convention/Bargaining.html"
+    bargain_number = None
 
     form_model = models.Player
     form_fields = [
@@ -190,7 +196,12 @@ class Bargaining(Page):
         "offer_player_A", "offer_player_B", "offer_player_C"]
 
     def is_displayed(self):
-        return not self.player.kicked_or_left_over()
+        if self.player.kicked_or_left_over():
+            return False
+        return not bool(self.group.coalition_selected)
+
+    def vars_for_template(self):
+        return {"bargain_number": self.bargain_number}
 
 
 class WaitForBargaing(WaitPage):
@@ -199,20 +210,27 @@ class WaitForBargaing(WaitPage):
 
     warning_time = None
     kick_time = None
+    bargain_number = None
 
     def is_displayed(self):
-        return not self.player.kicked_or_left_over()
+        if self.player.kicked_or_left_over():
+            return False
+        return not bool(self.group.coalition_selected)
 
 
 class CoalitionSelection(Page):
     warning_time = "seconds_before_idle_warning_game_1"
     kick_time = "seconds_before_booted_from_study_after_warning"
+    template_name = "political_convention/CoalitionSelection.html"
+    bargain_number = None
 
     form_model = models.Player
     form_fields = ["coalition_selected"]
 
     def is_displayed(self):
-        return not self.player.kicked_or_left_over()
+        if self.player.kicked_or_left_over():
+            return False
+        return not bool(self.group.coalition_selected)
 
     def vars_for_template(self):
         sugestions = dict()
@@ -221,22 +239,43 @@ class CoalitionSelection(Page):
                 s = (p.sugest_coalition_with, p.offer_resume(), p.id)
                 skey = s[:-1]
                 sugestions[skey] = s
-        return {"sugestions": sorted(sugestions.values())}
+        return {"sugestions": sorted(sugestions.values()), "bargain_number": self.bargain_number}
 
 
 class WaitForCoalitionSelection(WaitPage):
     title_text = "Wait For all Players Proposals"
     body_text = "Wait until all players are done with their coalition proposals"
+    repeat_number = None
 
     warning_time = None
     kick_time = None
 
     def is_displayed(self):
-        return not self.player.kicked_or_left_over()
+        if self.player.kicked_or_left_over():
+            return False
+        return not bool(self.group.coalition_selected)
 
     def after_all_players_arrive(self):
-        self.group.select_coalition()
+        self.group.select_coalition(self.bargain_number)
 
+to_cicle = (
+    Bargaining,
+    WaitForBargaing,
+    CoalitionSelection,
+    WaitForCoalitionSelection
+)
+cicle = []
+for idx in range(Constants.p.maximun_number_of_bargaining_rounds_possible):
+    contents = {"bargain_number": idx + 1}
+    cicle.extend(
+        type("{}{}".format(cls.__name__, idx), (cls,), contents) for cls in to_cicle)
+
+globals().update({cls.__name__: cls for cls in cicle})
+del to_cicle
+
+# =============================================================================
+# END CYCLE
+# =============================================================================
 
 class Result(Page):
 
@@ -265,22 +304,20 @@ class Kicked(Page):
             self.subsession.round_number == Constants.num_rounds)
 
 
+# =============================================================================
+# SEQUENCE
+# =============================================================================
+
 page_sequence = [
-    InformedConsent,
-    Instructions1, Instructions2, Instructions3, Instructions4,
-    PhasesDescription, ComprehensionCheck,
+    #~ InformedConsent,
+    #~ Instructions1, Instructions2, Instructions3, Instructions4,
+    #~ PhasesDescription, ComprehensionCheck,
 
-    PossitionAssignment,
+    #~ PossitionAssignment,
     WaitPossitionAssignment,
-    PositionAssignmentResult,
-
-    Bargaining,
-    WaitForBargaing,
-    CoalitionSelection,
-    WaitForCoalitionSelection,
+    #~ PositionAssignmentResult
+] + cicle + [
     Result,
-
     LeftOver,
-
     Kicked
 ]

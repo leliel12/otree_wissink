@@ -2,7 +2,7 @@
 {% load staticfiles otree_tags %}
 
 {% block title %}
-    Coalition Selection - Round {{subsession.round_number}}/{{Constants.num_rounds}}
+    Coalition Selection - Iteration {{subsession.round_number}}/{{Constants.num_rounds}}
 {% endblock %}
 
 {% block styles %}
@@ -21,6 +21,7 @@
             <strong class="text-success">A coalition has been formed.</strong>
             The formed coalition is displayed in <strong class="text-success">Green</strong>
             {% else %}
+            <strong class="text-danger">Maximun number of bargains reached</strong><br>
             <strong class="text-danger">No coalition has been formed.</strong>
             {% endif %}
         </p>

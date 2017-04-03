@@ -2,7 +2,7 @@
 {% load staticfiles otree_tags %}
 
 {% block title %}
-    Coalition Selection - Round {{subsession.round_number}}/{{Constants.num_rounds}}
+    Coalition Selection - Round {{bargain_number}}/{{Constants.p.maximun_number_of_bargaining_rounds_possible}}
 {% endblock %}
 
 {% block styles %}
@@ -47,7 +47,7 @@
         <ul>
             {% for cw, or, pid in sugestions %}
             <li>
-                <input required type="radio" name="coalition_selected" value="pid">
+                <input required type="radio" name="coalition_selected" value="{{pid}}">
                 {{cw}} Coalition ({{or}})
             </li>
             {% endfor %}

@@ -25,12 +25,12 @@ Your app description
 
 
 class Constants(BaseConstants):
-    name_in_url = 'political_convention'
-    players_per_group = None
-    num_rounds = 3
-
     p_path = settings.POLITICAL_CONVENTION_PARAMS_PATH
     p = utils.parse_argsfile(p_path)
+
+    name_in_url = 'political_convention'
+    players_per_group = None
+    num_rounds = p.number_of_games
 
     comprehension_questions = [
         utils.ComprehensionQuestion(
@@ -84,13 +84,14 @@ class Subsession(BaseSubsession):
 class Group(BaseGroup):
 
     coalition_selected = models.IntegerField()
+    last_bargain_number = models.IntegerField()
 
     def get_players(self):
         players = super(Group, self).get_players()
         players.sort(key=lambda p: p.position)
         return players
 
-    def select_coalition(self):
+    def select_coalition(self, bargain_number):
         votes = {}
         for player in self.get_players():
             cs = player.coalition_selected
@@ -105,6 +106,7 @@ class Group(BaseGroup):
             votes_list = list(votes_filtered.items())
             votes_list.sort(key=lambda e: e[1])
             self.coalition_selected = votes_list[0][0]
+        self.last_bargain_number = bargain_number
 
     def coalition_sugestor(self):
         return Player.objects.get(id=self.coalition_selected)
