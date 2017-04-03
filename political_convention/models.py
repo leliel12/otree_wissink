@@ -52,15 +52,22 @@ class Constants(BaseConstants):
 class Subsession(BaseSubsession):
 
     def before_session_starts(self):
-        positions = it.cycle(Constants.positions)
         if self.round_number == 1:
-            participants = [p.participant for p in self.get_players()]
-            random.shuffle(participants)
-            for participant in participants:
-                participant.vars["secret_key"] = str(uuid.uuid4())
-                position = next(positions)
-                for player in participant.get_players():
-                    player.position = position
+            positions = it.cycle(Constants.positions)
+            players = self.get_players()
+            random.shuffle(players)
+            for player in players:
+                player.participant.vars["secret_key"] = str(uuid.uuid4())
+                player.position = next(positions)
+        else:
+            positions = it.cycle(Constants.positions)
+            players = self.get_players()
+            random.shuffle(players)
+            for player in players:
+                if Constants.p.randomization_to_different_positions_between_games:
+                    player.position = next(positions)
+                else:
+                    player.position = player.in_round(1).position
 
     def players_by_position(self):
         pas, pbs, pcs, ks = [], [], [], []

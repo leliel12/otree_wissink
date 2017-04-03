@@ -140,29 +140,30 @@ class WaitPossitionAssignment(WaitPage):
     kick_time = None
 
     def after_all_players_arrive(self):
-        pas, pbs, pcs, kicked = self.subsession.players_by_position()
+        if self.subsession.round_number == 1 or Constants.p.random_assignment_to_different_bargaining_partners_between_games:
+            pas, pbs, pcs, kicked = self.subsession.players_by_position()
 
-        random.shuffle(pas)
-        random.shuffle(pbs)
-        random.shuffle(pcs)
-        group_matrix = []
-        for a, b, c in it.zip_longest(pas, pbs, pcs):
-            row = []
-            if a:
-                row.append(a)
-            if b:
-                row.append(b)
-            if c:
-                row.append(c)
-            if row:
-                group_matrix.append(row)
-        if kicked:
-            group_matrix.append(kicked)
-        for g in group_matrix:
-            if len(g) != 3:
-                for p in g:
-                    p.left_over = True
-        self.subsession.set_group_matrix(group_matrix)
+            random.shuffle(pas)
+            random.shuffle(pbs)
+            random.shuffle(pcs)
+            group_matrix = []
+            for a, b, c in it.zip_longest(pas, pbs, pcs):
+                row = []
+                if a:
+                    row.append(a)
+                if b:
+                    row.append(b)
+                if c:
+                    row.append(c)
+                if row:
+                    group_matrix.append(row)
+            if kicked:
+                group_matrix.append(kicked)
+            for g in group_matrix:
+                if len(g) != 3:
+                    for p in g:
+                        p.left_over = True
+            self.subsession.set_group_matrix(group_matrix)
 
 
 class PositionAssignmentResult(Page):
@@ -309,13 +310,13 @@ class Kicked(Page):
 # =============================================================================
 
 page_sequence = [
-    #~ InformedConsent,
-    #~ Instructions1, Instructions2, Instructions3, Instructions4,
-    #~ PhasesDescription, ComprehensionCheck,
+    InformedConsent,
+    Instructions1, Instructions2, Instructions3, Instructions4,
+    PhasesDescription, ComprehensionCheck,
 
-    #~ PossitionAssignment,
+    PossitionAssignment,
     WaitPossitionAssignment,
-    #~ PositionAssignmentResult
+    PositionAssignmentResult
 ] + cicle + [
     Result,
     LeftOver,
