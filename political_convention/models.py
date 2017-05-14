@@ -99,21 +99,42 @@ class Group(BaseGroup):
         return players
 
     def select_coalition(self, bargain_number):
-        votes = {}
+        votes, total_votes = {}, 0
         for player in self.get_players():
             cs = player.coalition_selected
             votes[cs] = votes.setdefault(cs, 0) + player.votes()
+            total_votes += player.votes()
 
         # remove all coalitions below the threshold
         threshold = Constants.p.votes_necessary_for_coalition
-        votes_filtered = {k: v for k, v in votes.items() if v >= threshold}
+        votes_filtered = {k: v for k, v in votes.items() if v >= threshold }
 
         # now sort by votes
         if votes_filtered:
             votes_list = list(votes_filtered.items())
             votes_list.sort(key=lambda e: e[1])
-            self.coalition_selected = votes_list[0][0]
+            coalition_candidate, candidate_votes = votes_list[0]
+
+            ctext = Player.objects.get(id=coalition_candidate).sugest_coalition_with
+            if len(ctext) != 3 or candidate_votes == total_votes:
+                self.coalition_selected = coalition_candidate
+            elif bargain_number != Constants.p.maximun_number_of_bargaining_rounds_possible:
+                for player in self.get_players():
+                    player.offer_player_A = None
+                    player.offer_player_B = None
+                    player.offer_player_C = None
+
         self.last_bargain_number = bargain_number
+
+    def set_payoff(self):
+        if self.coalition_selected:
+            sugestor = self.coalition_sugestor()
+            payoffs = {
+                Constants.pA: sugestor.offer_player_A,
+                Constants.pB: sugestor.offer_player_B,
+                Constants.pC: sugestor.offer_player_C}
+            for player in self.get_players():
+                player.payoff = payoffs.get(player.position, None)
 
     def coalition_sugestor(self):
         return Player.objects.get(id=self.coalition_selected)
@@ -135,7 +156,6 @@ class Player(BasePlayer):
 
     # this store the id of the creator of the coalition
     coalition_selected = models.IntegerField()
-
 
     def coalition_sugestor(self):
         return Player.objects.get(id=self.coalition_selected)
@@ -197,4 +217,3 @@ for idx, cq in enumerate(Constants.comprehension_questions):
                                              choices=cq.choices,
                                              widget=widgets.RadioSelectHorizontal())
     )
-

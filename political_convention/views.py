@@ -258,6 +258,7 @@ class WaitForCoalitionSelection(WaitPage):
 
     def after_all_players_arrive(self):
         self.group.select_coalition(self.bargain_number)
+        self.group.set_payoff()
 
 to_cicle = (
     Bargaining,
@@ -282,6 +283,23 @@ class Result(Page):
 
     warning_time = "seconds_before_idle_warning_game_1"
     kick_time = "seconds_before_booted_from_study_after_warning"
+
+    def vars_for_template(self):
+        sugestions = dict()
+        for p in self.group.get_players():
+            skey = (p.sugest_coalition_with, p.offer_resume())
+            sugestions[skey] = {
+                "sugested_by": p,
+                "coalition": p.sugest_coalition_with,
+                "payoff_a": p.offer_player_A,
+                "payoff_b": p.offer_player_B,
+                "payoff_c": p.offer_player_C,
+                "selected_by": p.who_votes_me(),
+                "selected": self.group.coalition_selected == p.id
+            }
+        sugestions = [sg for _, sg in sorted(sugestions.items())]
+        return {"sugestions": sugestions}
+
 
     def is_displayed(self):
         return not self.player.kicked_or_left_over()

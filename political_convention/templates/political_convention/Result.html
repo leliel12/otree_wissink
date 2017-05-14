@@ -29,28 +29,28 @@
 
         <table class="table table-hover">
             <thead>
-                <th>Player making offer</th>
                 <th>Proposed Coalition</th>
                 <th>Payoff Player A</th>
                 <th>Payoff Player B</th>
                 <th>Payoff Player C</th>
+                <th>Proposed By</th>
                 <th>Selected by</th>
             </thead>
             <tbody>
-                {% for p in group.get_players %}
-                <tr class="{% if group.coalition_selected == p.id %}alert alert-success{% endif %}">
+                {% for sg in sugestions %}
+                <tr class="{% if sg.selected %}alert alert-success{% endif %}">
+                    <td>{{sg.coalition}}</td>
+                    <td>{{sg.payoff_a}}</td>
+                    <td>{{sg.payoff_b}}</td>
+                    <td>{{sg.payoff_c}}</td>
                     <td>
-                        Player {{p.position}}
-                        {% if p == player %}
+                        Player {{sg.sugested_by.position}}
+                        {% if sg.sugested_by == player %}
                         <strong class="text-info">(You)</strong>
                         {% endif %}
                     </td>
-                    <td>{{p.sugest_coalition_with}}</td>
-                    <td>{{p.offer_player_A}}</td>
-                    <td>{{p.offer_player_B}}</td>
-                    <td>{{p.offer_player_C}}</td>
                     <td>
-                        {% for wv in p.who_votes_me %}
+                        {% for wv in sg.selected_by %}
                         <p class="wv">
                             Player {{wv.position}}
                             {% if wv == player %}
@@ -74,4 +74,3 @@
     </div>
 </div>
 {% endblock %}
-
