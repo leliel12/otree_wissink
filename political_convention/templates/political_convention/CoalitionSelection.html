@@ -2,7 +2,9 @@
 {% load staticfiles otree_tags %}
 
 {% block title %}
-    Coalition Selection - Round {{bargain_number}}/{{Constants.p.maximun_number_of_bargaining_rounds_possible}}
+    Coalition Selection -
+    Iteration {{subsession.round_number}}/{{Constants.num_rounds}} -
+    Round {{bargain_number}}/{{Constants.p.maximun_number_of_bargaining_rounds_possible}}
 {% endblock %}
 
 {% block styles %}
@@ -61,4 +63,3 @@
     </div>
 </div>
 {% endblock %}
-
