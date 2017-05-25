@@ -119,13 +119,14 @@ class Group(BaseGroup):
             ctext = Player.objects.get(id=coalition_candidate).sugest_coalition_with
             if len(ctext) != 3 or candidate_votes == total_votes:
                 self.coalition_selected = coalition_candidate
-            elif bargain_number != Constants.p.maximun_number_of_bargaining_rounds_possible:
-                for player in self.get_players():
-                    player.offer_player_A = None
-                    player.offer_player_B = None
-                    player.offer_player_C = None
 
         self.last_bargain_number = bargain_number
+
+    def clear_fields(self):
+        for player in self.get_players():
+            player.offer_player_A = None
+            player.offer_player_B = None
+            player.offer_player_C = None
 
     def set_payoff(self):
         if self.coalition_selected:
@@ -139,6 +140,26 @@ class Group(BaseGroup):
 
     def coalition_sugestor(self):
         return Player.objects.get(id=self.coalition_selected)
+
+    def selection_resume(self):
+        sugestions = {}
+        for p in self.get_players():
+            skey = (p.sugest_coalition_with, p.offer_resume())
+            if skey in sugestions:
+                sugested_by = sugestions[skey]["sugested_by"] + [p]
+            else:
+                sugested_by = [p]
+            sugestions[skey] = {
+                "sugested_by": sugested_by,
+                "coalition": p.sugest_coalition_with,
+                "payoff_a": p.offer_player_A,
+                "payoff_b": p.offer_player_B,
+                "payoff_c": p.offer_player_C,
+                "selected_by": p.who_votes_me(),
+                "selected": self.coalition_selected == p.id
+            }
+        sugestions = [sg for _, sg in sorted(sugestions.items())]
+        return sugestions
 
 
 # =============================================================================

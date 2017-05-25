@@ -260,11 +260,36 @@ class WaitForCoalitionSelection(WaitPage):
         self.group.select_coalition(self.bargain_number)
         self.group.set_payoff()
 
+
+class FailCoalition(Page):
+
+    warning_time = "seconds_before_idle_warning_game_1"
+    kick_time = "seconds_before_booted_from_study_after_warning"
+    template_name = "political_convention/FailCoalition.html"
+    bargain_number = None
+
+    def is_displayed(self):
+        if self.player.kicked_or_left_over():
+            return False
+        elif self.bargain_number == Constants.p.maximun_number_of_bargaining_rounds_possible:
+            return False
+        return not bool(self.group.coalition_selected)
+
+    def vars_for_template(self):
+        sugestions = self.group.selection_resume()
+        return {"sugestions": sugestions}
+
+    def before_next_page(self):
+        if self.bargain_number != Constants.p.maximun_number_of_bargaining_rounds_possible:
+            self.group.clear_fields()
+
+
 to_cicle = (
     Bargaining,
     WaitForBargaing,
     CoalitionSelection,
-    WaitForCoalitionSelection
+    WaitForCoalitionSelection,
+    FailCoalition
 )
 cicle = []
 for idx in range(Constants.p.maximun_number_of_bargaining_rounds_possible):
@@ -285,25 +310,8 @@ class Result(Page):
     kick_time = "seconds_before_booted_from_study_after_warning"
 
     def vars_for_template(self):
-        sugestions = dict()
-        for p in self.group.get_players():
-            skey = (p.sugest_coalition_with, p.offer_resume())
-            if skey in sugestions:
-                sugested_by = sugestions[skey]["sugested_by"] + [p]
-            else:
-                sugested_by = [p]
-            sugestions[skey] = {
-                "sugested_by": sugested_by,
-                "coalition": p.sugest_coalition_with,
-                "payoff_a": p.offer_player_A,
-                "payoff_b": p.offer_player_B,
-                "payoff_c": p.offer_player_C,
-                "selected_by": p.who_votes_me(),
-                "selected": self.group.coalition_selected == p.id
-            }
-        sugestions = [sg for _, sg in sorted(sugestions.items())]
+        sugestions = self.group.selection_resume()
         return {"sugestions": sugestions}
-
 
     def is_displayed(self):
         return not self.player.kicked_or_left_over()
@@ -341,13 +349,13 @@ class Kicked(Page):
 # =============================================================================
 
 page_sequence = [
-    #~ InformedConsent,
-    #~ Instructions1, Instructions2, Instructions3, Instructions4,
-    #~ PhasesDescription, ComprehensionCheck,
+    InformedConsent,
+    Instructions1, Instructions2, Instructions3, Instructions4,
+    PhasesDescription, ComprehensionCheck,
 
-    #~ PossitionAssignment,
+    PossitionAssignment,
     WaitPossitionAssignment,
-    #~ PositionAssignmentResult
+    PositionAssignmentResult
 ] + cicle + [
     Result,
     Resume,

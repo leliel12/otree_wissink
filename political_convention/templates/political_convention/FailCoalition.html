@@ -1,0 +1,76 @@
+{% extends "political_convention/Base.html" %}
+{% load staticfiles otree_tags %}
+
+{% block title %}
+    Coalition Selection Fail -
+    Iteration {{subsession.round_number}}/{{Constants.num_rounds}} -
+    Round {{group.last_bargain_number}}/{{Constants.p.maximun_number_of_bargaining_rounds_possible}}
+{% endblock %}
+
+{% block styles %}
+<style>
+    p.wv {
+        margin: 0px !important;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <p>
+            <strong class="text-danger">No coalition has been formed in this Round.</strong>
+        </p>
+        <p>Below you can find which offers have been selected</p>
+
+        <table class="table table-hover">
+            <thead>
+                <th>Proposed Coalition</th>
+                <th>Payoff Player A</th>
+                <th>Payoff Player B</th>
+                <th>Payoff Player C</th>
+                <th>Proposed By</th>
+                <th>Selected by</th>
+            </thead>
+            <tbody>
+                {% for sg in sugestions %}
+                <tr class="{% if sg.selected %}alert alert-success{% endif %}">
+                    <td>{{sg.coalition}}</td>
+                    <td>{{sg.payoff_a}}</td>
+                    <td>{{sg.payoff_b}}</td>
+                    <td>{{sg.payoff_c}}</td>
+                    <td>
+                        {% for sb in sg.sugested_by %}
+                        <p class="wv">
+                            Player {{sb.position}}
+                            {% if sb == player %}
+                            <strong class="text-info">(You)</strong>
+                            {% endif %}
+                        </p>
+                        {% endfor %}
+                    </td>
+                    <td>
+                        {% for wv in sg.selected_by %}
+                        <p class="wv">
+                            Player {{wv.position}}
+                            {% if wv == player %}
+                            <strong class="text-info">(You)</strong>
+                            {% endif %}
+                        </p>
+                        {% endfor %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <p>Please press <kbd>Next</kbd> to start a new bargaining round</p>
+    </div>
+</div>
+
+
+<div class="row">
+    <div class="col-md-1 col-md-offset-11">
+        {% next_button %}
+    </div>
+</div>
+{% endblock %}
