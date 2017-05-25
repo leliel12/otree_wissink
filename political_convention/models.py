@@ -101,6 +101,7 @@ class Group(BaseGroup):
     def select_coalition(self, bargain_number):
         votes, total_votes = {}, 0
         for player in self.get_players():
+            player.save_sugestion(bargain_number)
             cs = player.coalition_selected
             votes[cs] = votes.setdefault(cs, 0) + player.votes()
             total_votes += player.votes()
@@ -157,6 +158,22 @@ class Player(BasePlayer):
     # this store the id of the creator of the coalition
     coalition_selected = models.IntegerField()
 
+    def save_sugestion(self, bargain_number):
+        for pt in "ABC":
+            fname_from = "offer_player_{}".format(pt)
+            value = getattr(self, fname_from)
+            fname_dest = "offer_player_{}_bargain_{}".format(pt, bargain_number)
+            setattr(self, fname_dest, value)
+
+        sugestor = self.coalition_sugestor()
+        fname_dest = "coalition_selected_bargain_{}".format(bargain_number)
+        setattr(self, fname_dest, sugestor.sugest_coalition_with)
+
+        fname_dest = "coalition_selected_resume_bargain_{}".format(bargain_number)
+        setattr(self, fname_dest, sugestor.offer_resume())
+        self.save()
+
+
     def coalition_sugestor(self):
         return Player.objects.get(id=self.coalition_selected)
 
@@ -210,10 +227,26 @@ class Player(BasePlayer):
     def votes(self):
         return getattr(Constants.p, "votes_player_{}".format(self.position))
 
+
+# =============================================================================
+# DYNAMIX FIELDS
+# =============================================================================
+
 for idx, cq in enumerate(Constants.comprehension_questions):
+    field = models.CharField(
+        max_length=cq.max_length, verbose_name=cq.question,
+        choices=cq.choices, widget=widgets.RadioSelectHorizontal())
+    Player.add_to_class("cq{}".format(idx), field)
+
+for idx in range(Constants.p.maximun_number_of_bargaining_rounds_possible):
+    rnd = idx + 1
     Player.add_to_class(
-        "cq{}".format(idx), models.CharField(max_length=cq.max_length,
-                                             verbose_name=cq.question,
-                                             choices=cq.choices,
-                                             widget=widgets.RadioSelectHorizontal())
-    )
+        "offer_player_A_bargain_{}".format(rnd), models.CurrencyField())
+    Player.add_to_class(
+        "offer_player_B_bargain_{}".format(rnd), models.CurrencyField())
+    Player.add_to_class(
+        "offer_player_C_bargain_{}".format(rnd), models.CurrencyField())
+    Player.add_to_class(
+        "coalition_selected_bargain_{}".format(rnd), models.CharField(max_length=3))
+    Player.add_to_class(
+        "coalition_selected_resume_bargain_{}".format(rnd), models.CharField(max_length=20))
