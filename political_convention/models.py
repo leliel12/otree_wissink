@@ -173,7 +173,6 @@ class Player(BasePlayer):
         setattr(self, fname_dest, sugestor.offer_resume())
         self.save()
 
-
     def coalition_sugestor(self):
         return Player.objects.get(id=self.coalition_selected)
 

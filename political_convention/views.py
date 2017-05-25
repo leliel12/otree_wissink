@@ -305,6 +305,15 @@ class Result(Page):
         return not self.player.kicked_or_left_over()
 
 
+class Resume(Page):
+
+    warning_time = "seconds_before_idle_warning_game_1"
+    kick_time = "seconds_before_booted_from_study_after_warning"
+
+    def is_displayed(self):
+        return not self.player.kicked_or_left_over()
+
+
 class LeftOver(Page):
     warning_time = None
     kick_time = None
@@ -337,6 +346,7 @@ page_sequence = [
     #~ PositionAssignmentResult
 ] + cicle + [
     Result,
+    Resume,
     LeftOver,
     Kicked
 ]

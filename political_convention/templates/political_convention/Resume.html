@@ -1,0 +1,44 @@
+{% extends "political_convention/Base.html" %}
+{% load staticfiles otree_tags %}
+
+{% block title %}
+    Resume -
+    Iteration {{subsession.round_number}}/{{Constants.num_rounds}} -
+    Round {{group.last_bargain_number}}/{{Constants.p.maximun_number_of_bargaining_rounds_possible}}
+{% endblock %}
+
+{% block styles %}
+<style>
+    p.wv {
+        margin: 0px !important;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 col-md-offset-2 text-center">
+        <p class="lead">
+            After {{subsession.round_number}}
+            {% if subsession.round_number == 1 %} iteration
+            {% else %} iterations {% endif %}
+            Your Current Payoff
+        </p>
+        <p class="lead text-info">{{player.participant.payoff}}</p>
+
+        <p class="lead">You will now be randomly assigned to two new participants</p>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-12">
+        <p>Please press <kbd>Next</kbd> to start a new bargaining round</p>
+    </div>
+</div>
+
+
+<div class="row">
+    <div class="col-md-1 col-md-offset-11">
+        {% next_button %}
+    </div>
+</div>
+{% endblock %}
