@@ -288,8 +288,12 @@ class Result(Page):
         sugestions = dict()
         for p in self.group.get_players():
             skey = (p.sugest_coalition_with, p.offer_resume())
+            if skey in sugestions:
+                sugested_by = sugestions[skey]["sugested_by"] + [p]
+            else:
+                sugested_by = [p]
             sugestions[skey] = {
-                "sugested_by": p,
+                "sugested_by": sugested_by,
                 "coalition": p.sugest_coalition_with,
                 "payoff_a": p.offer_player_A,
                 "payoff_b": p.offer_player_B,

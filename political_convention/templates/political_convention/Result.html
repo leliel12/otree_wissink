@@ -46,10 +46,14 @@
                     <td>{{sg.payoff_b}}</td>
                     <td>{{sg.payoff_c}}</td>
                     <td>
-                        Player {{sg.sugested_by.position}}
-                        {% if sg.sugested_by == player %}
-                        <strong class="text-info">(You)</strong>
-                        {% endif %}
+                        {% for sb in sg.sugested_by %}
+                        <p class="wv">
+                            Player {{sb.position}}
+                            {% if sb == player %}
+                            <strong class="text-info">(You)</strong>
+                            {% endif %}
+                        </p>
+                        {% endfor %}
                     </td>
                     <td>
                         {% for wv in sg.selected_by %}
