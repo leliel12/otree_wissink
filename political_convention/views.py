@@ -349,13 +349,13 @@ class Kicked(Page):
 # =============================================================================
 
 page_sequence = [
-    InformedConsent,
-    Instructions1, Instructions2, Instructions3, Instructions4,
-    PhasesDescription, ComprehensionCheck,
+    #~ InformedConsent,
+    #~ Instructions1, Instructions2, Instructions3, Instructions4,
+    #~ PhasesDescription, ComprehensionCheck,
 
-    PossitionAssignment,
+    #~ PossitionAssignment,
     WaitPossitionAssignment,
-    PositionAssignmentResult
+    #~ PositionAssignmentResult
 ] + cicle + [
     Result,
     Resume,

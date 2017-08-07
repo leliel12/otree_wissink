@@ -204,6 +204,7 @@ class Player(BasePlayer):
 
     def offer_resume(self):
         offers = (self.offer_player_A, self.offer_player_B, self.offer_player_C)
+        offers = [o for o in offers if o is not None]
         offers_int = map(int, offers)
         offers_str = map(str, offers_int)
         return "-".join(offers_str)
