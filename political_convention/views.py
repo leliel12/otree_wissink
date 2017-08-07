@@ -236,8 +236,9 @@ class CoalitionSelection(Page):
     def vars_for_template(self):
         sugestions = dict()
         for p in self.group.get_players():
-            if self.player.position in p.sugest_coalition_with:
-                s = (p.sugest_coalition_with, p.offer_resume(), p.id)
+            scw = p.sugest_coalition_with
+            if scw and self.player.position in p.sugest_coalition_with:
+                s = (scw, p.offer_resume(), p.id)
                 skey = s[:-1]
                 sugestions[skey] = s
         return {"sugestions": sorted(sugestions.values()), "bargain_number": self.bargain_number}
@@ -349,13 +350,13 @@ class Kicked(Page):
 # =============================================================================
 
 page_sequence = [
-    #~ InformedConsent,
-    #~ Instructions1, Instructions2, Instructions3, Instructions4,
-    #~ PhasesDescription, ComprehensionCheck,
+    InformedConsent,
+    Instructions1, Instructions2, Instructions3, Instructions4,
+    PhasesDescription, ComprehensionCheck,
 
-    #~ PossitionAssignment,
+    PossitionAssignment,
     WaitPossitionAssignment,
-    #~ PositionAssignmentResult
+    PositionAssignmentResult
 ] + cicle + [
     Result,
     Resume,
