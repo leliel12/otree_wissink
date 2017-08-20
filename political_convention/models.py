@@ -12,7 +12,7 @@ from otree.api import (
     Currency as c, currency_range, safe_json,
 )
 
-from otree.db.serializedfields import JSONField
+from jsonfield import JSONField
 
 from . import utils
 
