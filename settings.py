@@ -66,7 +66,7 @@ USE_POINTS = True
 LANGUAGE_CODE = 'en'
 
 # if an app is included in SESSION_CONFIGS, you don't need to list it here
-INSTALLED_APPS = []
+INSTALLED_APPS = ["django_extensions"]
 
 # SENTRY_DSN = ''
 

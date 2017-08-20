@@ -20,6 +20,7 @@ from .models import Constants
 def vars_for_all_templates(page):
     return {
         "p": Constants.p,
+        "kick_page_index": page_sequence.index(Kicked) + 1,
         "enable_warning_and_kick": Constants.p.enable_warning_and_kick,
         "warning_time": Constants.p.get(page.warning_time),
         "kick_time": Constants.p.get(page.kick_time),
@@ -352,16 +353,22 @@ class Kicked(Page):
 # =============================================================================
 
 page_sequence = [
-    InformedConsent,
-    Instructions1, Instructions2, Instructions3, Instructions4,
-    PhasesDescription, ComprehensionCheck,
+    InformedConsent if Constants.p.enable_instructions else None,
+    Instructions1 if Constants.p.enable_instructions else None,
+    Instructions2 if Constants.p.enable_instructions else None,
+    Instructions3 if Constants.p.enable_instructions else None,
+    Instructions4 if Constants.p.enable_instructions else None,
+    PhasesDescription if Constants.p.enable_instructions else None,
+    ComprehensionCheck if Constants.p.enable_instructions else None,
 
-    PossitionAssignment,
+    PossitionAssignment if Constants.p.enable_instructions else None,
     WaitPossitionAssignment,
-    PositionAssignmentResult
+    PositionAssignmentResult if Constants.p.enable_instructions else None
 ] + cicle + [
     Result,
     Resume,
     LeftOver,
     Kicked
 ]
+
+page_sequence = [p for p in page_sequence if p]
