@@ -20,6 +20,7 @@ from .models import Constants
 def vars_for_all_templates(page):
     return {
         "p": Constants.p,
+        "enable_warning_and_kick": Constants.p.enable_warning_and_kick,
         "warning_time": Constants.p.get(page.warning_time),
         "kick_time": Constants.p.get(page.kick_time),
         "DEBUG": settings.DEBUG,
@@ -51,8 +52,8 @@ def kick_player(request):
 
 class InformedConsent(Page):
     timeout_seconds = 15 * 60
-    warning_time = "seconds_before_idle_warning_instruction"
-    kick_time = "seconds_before_booted_from_study_after_warning"
+    warning_time = None
+    kick_time = None
 
     def is_displayed(self):
         return self.subsession.round_number == 1 and not self.player.kicked
@@ -138,6 +139,9 @@ class WaitPossitionAssignment(WaitPage):
 
     warning_time = None
     kick_time = None
+
+    def is_displayed(self):
+        return not self.player.kicked
 
     def after_all_players_arrive(self):
         if self.subsession.round_number == 1 or Constants.p.random_assignment_to_different_bargaining_partners_between_games:
@@ -340,9 +344,7 @@ class Kicked(Page):
     kick_time = None
 
     def is_displayed(self):
-        return (
-            self.player.kicked and
-            self.subsession.round_number == Constants.num_rounds)
+        return self.player.kicked
 
 
 # =============================================================================
