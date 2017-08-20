@@ -25,8 +25,8 @@ Your app description
 
 
 class Constants(BaseConstants):
-    p_path = settings.POLITICAL_CONVENTION_PARAMS_PATH
-    p = utils.parse_argsfile(p_path)
+    p_paths = settings.POLITICAL_CONVENTION_PARAMS_PATH
+    p = utils.parse_argsfiles(*p_paths)
 
     name_in_url = 'political_convention'
     players_per_group = None

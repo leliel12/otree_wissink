@@ -138,8 +138,14 @@ SESSION_CONFIGS = [
 ]
 
 
-POLITICAL_CONVENTION_PARAMS_PATH = os.path.join(
-    BASE_DIR, 'political_convention', 'parameters.cfg')
+POLITICAL_CONVENTION_PARAMS_PATH = [
+    os.path.join(BASE_DIR, 'parameters.cfg'),
+    os.path.join(BASE_DIR, 'dev_parameters.cfg'),
+]
+
+POLITICAL_CONVENTION_PARAMS_PATH = [
+    path for path in POLITICAL_CONVENTION_PARAMS_PATH
+    if os.path.exists(path)]
 
 
 ROOT_URLCONF = 'urls'

@@ -62,5 +62,6 @@ target/
 _bin/
 setuptools-*.zip
 _doc/20151125/.~lock.Inter-seccion2.docx#
+dev_parameters.cfg
 db.sqlite3*
 out.csv

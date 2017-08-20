@@ -174,12 +174,13 @@ class ComprehensionQuestion(object):
 # FUNCTIONS
 # =============================================================================
 
-def parse_argsfile(path):
-    config = configparser.ConfigParser()
-    config.optionxform = str
-    config.read(path)
-    kwargs = {
-        option: config.get(SECTION, option)
-        for option in config.options(SECTION)}
-    return Params(path=path, **kwargs)
-
+def parse_argsfiles(*paths):
+    kwargs = {}
+    for path in paths:
+        config = configparser.ConfigParser()
+        config.optionxform = str
+        config.read(path)
+        kwargs.update({
+            option: config.get(SECTION, option)
+            for option in config.options(SECTION)})
+    return Params(path=paths, **kwargs)
