@@ -30,6 +30,8 @@
 function kickUser(){
     $("form#form").hide();
     $("#inactivity_warning").hide();
+    $("form#form").parent().append('<div class="text-center lead alert alert-danger">You are currently kicked out of the experiment</div>');
+    window.scrollTo(0, 0);
     var url = "{% url 'ajax_political_convention:kick_player' %}";
     var kickUrl = "{% url 'political_convention-views-Kicked' participant_code=participant.code page_index=kick_page_index %}";
     var msgData = {
@@ -80,6 +82,19 @@ $(document).ready(function(){
     {% endif %}
 });
 </script>
-
 {% endif %}
+
+{% if p.enable_autokick_button %}
+<script>
+function doKick(){
+    kickUser();
+    return false
+}
+
+$(document).ready(function(){
+    $("form#form").append('<input onclick="doKick();" class="text-center btn btn-danger btn-lg" type="button" value="Kick Me!">');
+});
+</script>
+{% endif %}
+
 {% endblock %}

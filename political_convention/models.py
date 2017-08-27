@@ -149,15 +149,16 @@ class Group(BaseGroup):
                 sugested_by = sugestions[skey]["sugested_by"] + [p]
             else:
                 sugested_by = [p]
-            sugestions[skey] = {
-                "sugested_by": sugested_by,
-                "coalition": p.sugest_coalition_with,
-                "payoff_a": p.offer_player_A,
-                "payoff_b": p.offer_player_B,
-                "payoff_c": p.offer_player_C,
-                "selected_by": p.who_votes_me(),
-                "selected": self.coalition_selected == p.id
-            }
+            if skey[0]:
+                sugestions[skey] = {
+                    "sugested_by": sugested_by,
+                    "coalition": p.sugest_coalition_with,
+                    "payoff_a": p.offer_player_A,
+                    "payoff_b": p.offer_player_B,
+                    "payoff_c": p.offer_player_C,
+                    "selected_by": p.who_votes_me(),
+                    "selected": self.coalition_selected == p.id
+                }
         sugestions = [sg for _, sg in sorted(sugestions.items())]
         return sugestions
 
@@ -186,12 +187,13 @@ class Player(BasePlayer):
             fname_dest = "offer_player_{}_bargain_{}".format(pt, bargain_number)
             setattr(self, fname_dest, value)
 
-        sugestor = self.coalition_sugestor()
-        fname_dest = "coalition_selected_bargain_{}".format(bargain_number)
-        setattr(self, fname_dest, sugestor.sugest_coalition_with)
+        if self.coalition_selected:
+            sugestor = self.coalition_sugestor()
+            fname_dest = "coalition_selected_bargain_{}".format(bargain_number)
+            setattr(self, fname_dest, sugestor.sugest_coalition_with)
 
-        fname_dest = "coalition_selected_resume_bargain_{}".format(bargain_number)
-        setattr(self, fname_dest, sugestor.offer_resume())
+            fname_dest = "coalition_selected_resume_bargain_{}".format(bargain_number)
+            setattr(self, fname_dest, sugestor.offer_resume())
         self.save()
 
     def coalition_sugestor(self):

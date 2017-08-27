@@ -246,7 +246,8 @@ class CoalitionSelection(Page):
                 s = (scw, p.offer_resume(), p.id)
                 skey = s[:-1]
                 sugestions[skey] = s
-        return {"sugestions": sorted(sugestions.values()), "bargain_number": self.bargain_number}
+        return {"sugestions": sorted(sugestions.values()),
+                "bargain_number": self.bargain_number}
 
 
 class WaitForCoalitionSelection(WaitPage):

@@ -25,6 +25,7 @@
             </thead>
             <tbody>
                 {% for p in group.get_players %}
+                {% if not p.kicked %}
                 <tr>
                     <td>
                         Player {{p.position}}
@@ -37,6 +38,21 @@
                     <td>{{p.offer_player_B}}</td>
                     <td>{{p.offer_player_C}}</td>
                 </tr>
+                {% else %}
+                <tr class="alert alert-danger">
+                    <td>
+                        Player {{p.position}}
+                        {% if p == player %}
+                        <strong class="text-info">(You)</strong>
+                        {% endif %}
+                        - <b>KICKED!</b>
+                    </td>
+                    <td>--</td>
+                    <td>--</td>
+                    <td>--</td>
+                    <td>--</td>
+                </tr>
+                {% endif %}
                 {% endfor %}
             </tbody>
         </table>
