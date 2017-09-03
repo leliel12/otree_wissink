@@ -1,0 +1,18 @@
+{% extends "global/Base.html" %}
+{% load staticfiles otree_tags %}
+
+{% block title %}
+    {% if player.left_over %}
+        You are Left Over of Round {{subsession.round_number}}/{{Constants.num_rounds}}
+    {% elif player.other_kicked %}
+        Another Player Was Kicked of the Group in Round {{subsession.round_number}}/{{Constants.num_rounds}}
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12 lead text-center">
+        <p class="text-info">Your Payoff: {{current_payoff}}</p>
+    </div>
+</div>
+{% endblock %}

@@ -70,9 +70,11 @@ class Subsession(BaseSubsession):
                     player.position = player.in_round(1).position
 
     def players_by_position(self):
-        pas, pbs, pcs, ks = [], [], [], []
+        pas, pbs, pcs, ks, ok = [], [], [], [], []
         for player in self.get_players():
             if player.kicked:
+                ks.append(player)
+            elif player.other_kicked:
                 ks.append(player)
             elif player.position == Constants.pA:
                 pas.append(player)
@@ -80,9 +82,7 @@ class Subsession(BaseSubsession):
                 pbs.append(player)
             elif player.position == Constants.pC:
                 pcs.append(player)
-        return pas, pbs, pcs, ks
-
-
+        return pas, pbs, pcs, ks, ok
 
 
 # =============================================================================
@@ -171,6 +171,7 @@ class Player(BasePlayer):
 
     kicked = models.BooleanField()
     left_over = models.BooleanField()
+    other_kicked = models.BooleanField()
     position = models.CharField(max_length=10, choices=Constants.positions)
     sugest_coalition_with = models.CharField(max_length=3)
     offer_player_A = models.CurrencyField()
@@ -212,7 +213,7 @@ class Player(BasePlayer):
         return "-".join(offers_str)
 
     def kicked_or_left_over(self):
-        return self.kicked or self.left_over
+        return self.kicked or self.left_over or self.other_kicked
 
     def who_votes_me(self):
         return [p for p in self.group.get_players() if p.coalition_selected == self.id]

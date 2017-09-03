@@ -43,6 +43,10 @@ def kick_player(request):
         for p in player.participant.get_players():
             p.kicked = True
             p.save()
+        for oplayer in player.get_others_in_group():
+            for p in oplayer.participant.get_players():
+                p.other_kicked = True
+                p.save()
         return JsonResponse({"kicked": True})
     return JsonResponse({"kicked": False})
 
@@ -146,7 +150,7 @@ class WaitPossitionAssignment(WaitPage):
 
     def after_all_players_arrive(self):
         if self.subsession.round_number == 1 or Constants.p.random_assignment_to_different_bargaining_partners_between_games:
-            pas, pbs, pcs, kicked = self.subsession.players_by_position()
+            pas, pbs, pcs, kicked, others_kicked = self.subsession.players_by_position()
 
             random.shuffle(pas)
             random.shuffle(pbs)
@@ -164,6 +168,8 @@ class WaitPossitionAssignment(WaitPage):
                     group_matrix.append(row)
             if kicked:
                 group_matrix.append(kicked)
+            if others_kicked:
+                group_matrix.append(others_kicked)
             for g in group_matrix:
                 if len(g) != 3:
                     for p in g:
@@ -333,12 +339,18 @@ class Resume(Page):
         return not self.player.kicked_or_left_over()
 
 
-class LeftOver(Page):
+class LeftOrAnotherKickedOver(Page):
     warning_time = None
     kick_time = None
 
     def is_displayed(self):
-        return self.player.left_over and not self.player.kicked
+        return (
+            self.player.kicked_or_left_over() and not
+            self.player.kicked)
+
+    def vars_for_template(self):
+        current_payoff = sum(p.payoff for p in self.player.in_all_rounds())
+        return {"current_payoff": current_payoff}
 
 
 class Kicked(Page):
@@ -368,7 +380,7 @@ page_sequence = [
 ] + cicle + [
     Result,
     Resume,
-    LeftOver,
+    LeftOrAnotherKickedOver,
     Kicked
 ]
 
