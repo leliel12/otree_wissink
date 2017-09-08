@@ -40,6 +40,7 @@ function kickUser(){
         session: "{{ session.code }}",
         player: "{{ player.id }}",
         secret_key: "{{ player.secret_key }}",
+        kick_group: {% if kick_group %} true, {% else %} false, {% endif %}
         csrfmiddlewaretoken: '{{ csrf_token }}'
     };
     $.post(url, msgData, function(data){

@@ -24,6 +24,7 @@ def vars_for_all_templates(page):
         "enable_warning_and_kick": Constants.p.enable_warning_and_kick,
         "warning_time": Constants.p.get(page.warning_time),
         "kick_time": Constants.p.get(page.kick_time),
+        "kick_group": getattr(page, "kick_group", True),
         "DEBUG": settings.DEBUG,
         "because_debug": "<small>DEBUG is True</small>"}
 
@@ -37,16 +38,18 @@ def kick_player(request):
     session_code = request.POST["session"]
     player_id = request.POST["player"]
     secret_key = request.POST["secret_key"]
+    kick_group = request.POST["kick_group"].lower() == "true"
     player = models.Player.objects.filter(
         session__code=session_code).get(id=player_id)
     if player and player.secret_key == secret_key:
         for p in player.participant.get_players():
             p.kicked = True
             p.save()
-        for oplayer in player.get_others_in_group():
-            for p in oplayer.participant.get_players():
-                p.other_kicked = True
-                p.save()
+        if kick_group:
+            for oplayer in player.get_others_in_group():
+                for p in oplayer.participant.get_players():
+                    p.other_kicked = True
+                    p.save()
         return JsonResponse({"kicked": True})
     return JsonResponse({"kicked": False})
 
@@ -59,6 +62,7 @@ class InformedConsent(Page):
     timeout_seconds = 15 * 60
     warning_time = None
     kick_time = None
+    kick_group = False
 
     def is_displayed(self):
         return self.subsession.round_number == 1 and not self.player.kicked
@@ -70,6 +74,7 @@ class InformedConsent(Page):
 class Instructions1(Page):
     warning_time = "seconds_before_idle_warning_instruction"
     kick_time = "seconds_before_booted_from_study_after_warning"
+    kick_group = False
 
     def is_displayed(self):
         return self.subsession.round_number == 1 and not self.player.kicked
@@ -78,6 +83,7 @@ class Instructions1(Page):
 class Instructions2(Page):
     warning_time = "seconds_before_idle_warning_instruction"
     kick_time = "seconds_before_booted_from_study_after_warning"
+    kick_group = False
 
     def is_displayed(self):
         return self.subsession.round_number == 1 and not self.player.kicked
@@ -86,6 +92,7 @@ class Instructions2(Page):
 class Instructions3(Page):
     warning_time = "seconds_before_idle_warning_instruction"
     kick_time = "seconds_before_booted_from_study_after_warning"
+    kick_group = False
 
     def is_displayed(self):
         return self.subsession.round_number == 1 and not self.player.kicked
@@ -94,6 +101,7 @@ class Instructions3(Page):
 class Instructions4(Page):
     warning_time = "seconds_before_idle_warning_instruction"
     kick_time = "seconds_before_booted_from_study_after_warning"
+    kick_group = False
 
     def is_displayed(self):
         return self.subsession.round_number == 1 and not self.player.kicked
@@ -102,6 +110,7 @@ class Instructions4(Page):
 class PhasesDescription(Page):
     warning_time = "seconds_before_idle_warning_instruction"
     kick_time = "seconds_before_booted_from_study_after_warning"
+    kick_group = False
 
     def is_displayed(self):
         return self.subsession.round_number == 1 and not self.player.kicked
@@ -110,6 +119,7 @@ class PhasesDescription(Page):
 class ComprehensionCheck(Page):
     warning_time = "seconds_before_idle_warning_instruction"
     kick_time = "seconds_before_booted_from_study_after_warning"
+    kick_group = False
 
     form_model = models.Player
     form_fields = [
@@ -132,6 +142,7 @@ class ComprehensionCheck(Page):
 class PossitionAssignment(Page):
     warning_time = "seconds_before_idle_warning_instruction"
     kick_time = "seconds_before_booted_from_study_after_warning"
+    kick_group = False
 
     def is_displayed(self):
         return self.subsession.round_number == 1 and not self.player.kicked
