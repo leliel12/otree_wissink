@@ -149,15 +149,20 @@ class PossitionAssignment(Page):
 
 
 class WaitPossitionAssignment(WaitPage):
-    title_text = "Possition Assignment"
-    body_text = "Wait until all asignment are done"
     wait_for_all_groups = True
 
     warning_time = None
     kick_time = None
 
-    def is_displayed(self):
-        return not self.player.kicked
+    def vars_for_template(self):
+        if self.player.kicked:
+            title_text = "Kicking"
+            body_text = "You are currently kicked out of the experiment"
+        else:
+            title_text = "Possition Assignment"
+            body_text = "Wait until all asignment are done"
+
+        return {'body_text': body_text, 'title_text': title_text}
 
     def after_all_players_arrive(self):
         if self.subsession.round_number == 1 or Constants.p.random_assignment_to_different_bargaining_partners_between_games:
