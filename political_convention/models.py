@@ -181,20 +181,23 @@ class Player(BasePlayer):
     # this store the id of the creator of the coalition
     coalition_selected = models.IntegerField()
 
-    def save_sugestion(self, bargain_number):
-        for pt in "ABC":
-            fname_from = "offer_player_{}".format(pt)
-            value = getattr(self, fname_from)
-            fname_dest = "offer_player_{}_bargain_{}".format(pt, bargain_number)
-            setattr(self, fname_dest, value)
+    history = JSONField(default=[])
 
+
+    def save_sugestion(self, bargain_number):
+        offers = {}
+        for pt in "ABC":
+            fname = "offer_player_{}".format(pt)
+            offers[fname] = getattr(self, fname)
+
+        coalsel = {}
         if self.coalition_selected:
             sugestor = self.coalition_sugestor()
-            fname_dest = "coalition_selected_bargain_{}".format(bargain_number)
-            setattr(self, fname_dest, sugestor.sugest_coalition_with)
+            coalsel["coalition_selected"] = sugestor.sugest_coalition_with
+            coalsel["offers_resume"] = sugestor.offer_resume()
 
-            fname_dest = "coalition_selected_resume_bargain_{}".format(bargain_number)
-            setattr(self, fname_dest, sugestor.offer_resume())
+        self.history = self.history + [{"offers": offers,
+                                        "coalition_selected": coalsel}]
         self.save()
 
     def coalition_sugestor(self):
@@ -261,16 +264,3 @@ for idx, cq in enumerate(Constants.comprehension_questions):
         max_length=cq.max_length, verbose_name=cq.question,
         choices=cq.choices, widget=widgets.RadioSelectHorizontal())
     Player.add_to_class("cq{}".format(idx), field)
-
-for idx in range(Constants.p.maximun_number_of_bargaining_rounds_possible):
-    rnd = idx + 1
-    Player.add_to_class(
-        "offer_player_A_bargain_{}".format(rnd), models.CurrencyField())
-    Player.add_to_class(
-        "offer_player_B_bargain_{}".format(rnd), models.CurrencyField())
-    Player.add_to_class(
-        "offer_player_C_bargain_{}".format(rnd), models.CurrencyField())
-    Player.add_to_class(
-        "coalition_selected_bargain_{}".format(rnd), models.CharField(max_length=3))
-    Player.add_to_class(
-        "coalition_selected_resume_bargain_{}".format(rnd), models.CharField(max_length=20))
